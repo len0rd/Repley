@@ -1,8 +1,16 @@
 package com.leotech.monitor.model.config;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlAccessorType( XmlAccessType.FIELD )
+@XmlRootElement( name = "ConnectionConfig" )
 public class ConnectionConfig {
-    private String host, username, password;
-    private int port;
+
+    @XmlElement(required = true) private String host, username, password;
+    @XmlElement(required = true) private int port;
 
     public ConnectionConfig(String host, int port, String username, String password) {
         this.host = host;
