@@ -9,21 +9,21 @@ import java.io.InputStreamReader;
  */
 public class ComputerResource {
 
-    public static void getInfo() {
-        try {
-            Process p = Runtime.getRuntime().exec("top -l 1 -n 0");
-            BufferedReader pReader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+  public static void getInfo() {
+    try {
+      Process p = Runtime.getRuntime().exec("top -l 1 -n 0");
+      BufferedReader pReader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
-            String line;
-            while((line= pReader.readLine())!=null) {
-                System.out.println(line);
-            }
-            pReader.close();
-            p.waitFor();
+      String line;
+      while ((line = pReader.readLine()) != null) {
+        System.out.println(line);
+      }
+      pReader.close();
+      p.waitFor();
 
 
-        } catch(Exception e) {
+    } catch (Exception e) {
 
-        }
     }
+  }
 }

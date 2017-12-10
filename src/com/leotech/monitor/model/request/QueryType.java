@@ -1,8 +1,8 @@
 package com.leotech.monitor.model.request;
 
 public enum QueryType {
-    byownerfunnel,
-    stagevalues,
-    threadhistory,
-    robotvalues
+  byownerfunnel,
+  stagevalues,
+  threadhistory,
+  robotvalues
 }

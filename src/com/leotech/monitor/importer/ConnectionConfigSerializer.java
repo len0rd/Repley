@@ -8,6 +8,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 public class ConnectionConfigSerializer {
+
   private final JAXBContext context;
 
   public ConnectionConfigSerializer() {
@@ -43,7 +44,8 @@ public class ConnectionConfigSerializer {
   }
 
   public void exportGenericConnection() {
-    ConnectionConfig conf = new ConnectionConfig("localhost", 3306, "tyler", "nerd");
+    ConnectionConfig conf = new ConnectionConfig("localhost", 3306, "tyler",
+        "nerd", true);
     exportConnection(conf, "conf/defaultConnection.xml");
   }
 
@@ -53,8 +55,9 @@ public class ConnectionConfigSerializer {
     return path;
   }
 
-private String getAbsoluteJarFilePath() throws URISyntaxException {
-    return ConnectionConfigSerializer.class.getProtectionDomain().getCodeSource().getLocation().toURI()
+  private String getAbsoluteJarFilePath() throws URISyntaxException {
+    return ConnectionConfigSerializer.class.getProtectionDomain().getCodeSource().getLocation()
+        .toURI()
         .getPath();
   }
 
