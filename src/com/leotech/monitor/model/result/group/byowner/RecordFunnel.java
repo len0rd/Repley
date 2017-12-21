@@ -5,7 +5,7 @@ import com.google.visualization.datasource.datatable.ColumnDescription;
 import com.google.visualization.datasource.datatable.DataTable;
 import com.google.visualization.datasource.datatable.TableRow;
 import com.google.visualization.datasource.datatable.value.ValueType;
-import com.leotech.monitor.datamanager.sql.MySqlTunnelAccessHelper;
+import com.leotech.monitor.datamanager.sql.MySqlTunneler;
 import com.leotech.monitor.model.modifier.Modifier;
 import com.leotech.monitor.model.modifier.ModifierContainer;
 import com.leotech.monitor.model.result.QueryResult;
@@ -87,8 +87,8 @@ public class RecordFunnel implements QueryResult {
     DataTable data = new DataTable();
     data.addColumns(cd);
 
-    MySqlTunnelAccessHelper queryManager = new MySqlTunnelAccessHelper();
-    //MySqlAccessHelper queryManager = new MySqlAccessHelper("localhost:3306", "scraper", "u23xhtu3");
+    MySqlTunneler queryManager = new MySqlTunneler();
+    //MySqlAccessor queryManager = new MySqlAccessor("localhost:3306", "scraper", "u23xhtu3");
     SqlResult result = queryManager.getQueryResults(QUERY, null);
     queryManager.close();
 

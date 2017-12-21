@@ -5,7 +5,7 @@ import com.jcraft.jsch.Session;
 import com.leotech.monitor.model.config.ConnectionConfig;
 import java.net.ServerSocket;
 
-public class MySqlTunnelAccessHelper extends MySqlAccessHelper {
+public class MySqlTunneler extends MySqlAccessor {
 
   private static final String REMOTE_HOST = "localhost";
   private static final int REMOTE_PORT = 3306;
@@ -14,11 +14,11 @@ public class MySqlTunnelAccessHelper extends MySqlAccessHelper {
   private Session sshSession;
 
 
-  public MySqlTunnelAccessHelper(ConnectionConfig sshConn, ConnectionConfig mysqlConn) {
+  public MySqlTunneler(ConnectionConfig sshConn, ConnectionConfig mysqlConn) {
     createConnection(sshConn, mysqlConn, null);
   }
 
-  public MySqlTunnelAccessHelper() {
+  public MySqlTunneler() {
     createConnection(defaultSSHConf, defaultMYSQLlConf, null);
   }
 

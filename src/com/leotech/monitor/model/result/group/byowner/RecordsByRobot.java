@@ -7,7 +7,7 @@ import java.util.List;
 public class RecordsByRobot extends GroupByCount {
 
   public RecordsByRobot(String byOwnerType, List<Modifier> modifiers) {
-    super("Robot_Name", "re_" + (byOwnerType == null && !byOwnerType.isEmpty() ?
+    super("Robot_Name", "re_" + (byOwnerType == null || byOwnerType.isEmpty() ?
         "fsbo_front" : byOwnerType.toLowerCase()) + ".re_fsbo", "Robot_Name", modifiers);
     super.setCountColumnMask("Records");
   }

@@ -4,13 +4,12 @@ import com.google.visualization.datasource.base.TypeMismatchException;
 import com.google.visualization.datasource.datatable.ColumnDescription;
 import com.google.visualization.datasource.datatable.DataTable;
 import com.google.visualization.datasource.datatable.value.ValueType;
-import com.leotech.monitor.datamanager.sql.MySqlTunnelAccessHelper;
+import com.leotech.monitor.datamanager.sql.MySqlTunneler;
 import com.leotech.monitor.model.modifier.Modifier;
 import com.leotech.monitor.model.modifier.ModifierContainer;
 import com.leotech.monitor.model.result.QueryResult;
 import com.leotech.monitor.model.sql.Row;
 import com.leotech.monitor.model.sql.SqlResult;
-import com.sun.istack.internal.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,8 +20,7 @@ public class GroupByCount implements QueryResult {
   private List<String> columns;
   private String countMask;
 
-  public GroupByCount(List<String> selectWithCount, String table, String groupByColumn,
-      @Nullable List<Modifier> modifiers) {
+  public GroupByCount(List<String> selectWithCount, String table, String groupByColumn, List<Modifier> modifiers) {
     StringBuilder selects = new StringBuilder("");
     for (String column : selectWithCount) {
       selects.append(column).append(", ");
@@ -40,23 +38,22 @@ public class GroupByCount implements QueryResult {
 
   public GroupByCount(String selectWithCount, String table, String groupByColumn,
       List<Modifier> modifiers) {
-    this(new ArrayList<String>() {{
+    this(new ArrayList<>() {{
       add(selectWithCount);
     }}, table, groupByColumn, modifiers);
   }
 
-  public GroupByCount(String selectWithCount, String table, String groupByColumn,
-      @Nullable Modifier modifier) {
-    this(new ArrayList<String>() {{
+  public GroupByCount(String selectWithCount, String table, String groupByColumn, Modifier modifier) {
+    this(new ArrayList<>() {{
            add(selectWithCount);
          }}, table, groupByColumn,
-        (modifier != null ? new ArrayList<Modifier>() {{
+        (modifier != null ? new ArrayList<>() {{
           add(modifier);
         }} : null));
   }
 
   public GroupByCount(String selectWithCount, String table, String groupByColumn) {
-    this(new ArrayList<String>() {{
+    this(new ArrayList<>() {{
       add(selectWithCount);
     }}, table, groupByColumn, null);
   }
@@ -82,8 +79,8 @@ public class GroupByCount implements QueryResult {
     DataTable data = new DataTable();
     data.addColumns(cd);
 
-    MySqlTunnelAccessHelper queryManager = new MySqlTunnelAccessHelper();
-    //MySqlAccessHelper queryManager = new MySqlAccessHelper("localhost:3306", "scraper", "u23xhtu3");
+    MySqlTunneler queryManager = new MySqlTunneler();
+    //MySqlAccessor queryManager = new MySqlAccessor("localhost:3306", "scraper", "u23xhtu3");
     System.out.println("query to run::" + query);
 
     SqlResult result = queryManager.getQueryResults(query, null);

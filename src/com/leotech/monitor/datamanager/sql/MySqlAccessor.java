@@ -3,29 +3,28 @@ package com.leotech.monitor.datamanager.sql;
 import com.leotech.monitor.model.config.ConnectionConfig;
 import com.leotech.monitor.model.sql.SqlResult;
 import java.sql.Connection;
-import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-public class MySqlAccessHelper {
-
-  protected final ConnectionConfig defaultMYSQLlConf = new ConnectionConfig("localhost", 3307,
-      "tyler", "password", true);
+public class MySqlAccessor {
   protected Connection conn = null;
 
   //default empty constructor
-  public MySqlAccessHelper() {
+  public MySqlAccessor() {}
+
+  public MySqlAccessor(ConnectionConfig conf, String database) {
+    this.createConnection(conf, database);
   }
 
-  public MySqlAccessHelper(String url, String user, String password) {
+  public MySqlAccessor(String url, String user, String password) {
     this.createConnection(url, user, password);
   }
 
   /**
-   * TODO: Add ssh tunnel support
+   *
    *
    * @param host Formatted as Address:Port/database_name
    * @param user Mysql username to use
@@ -64,7 +63,7 @@ public class MySqlAccessHelper {
     }
     try {
       DriverManager.registerDriver(new com.mysql.jdbc.Driver());
-      Class.forName("com.mysql.jdbc.Driver");
+      //Class.forName("com.mysql.jdbc.Driver");
       conn = DriverManager.getConnection(host, conf.getUsername(), conf.getPassword());
     } catch (Exception e) {
       System.out.println("Failed to instantiate connection!");
