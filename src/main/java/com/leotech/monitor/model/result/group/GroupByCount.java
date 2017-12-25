@@ -38,27 +38,27 @@ public class GroupByCount implements QueryResult {
 
   public GroupByCount(String selectWithCount, String table, String groupByColumn,
       List<Modifier> modifiers) {
-    this(new ArrayList<>() {{
+    this(new ArrayList<String>() {{
       add(selectWithCount);
     }}, table, groupByColumn, modifiers);
   }
 
   public GroupByCount(String selectWithCount, String table, String groupByColumn, Modifier modifier) {
-    this(new ArrayList<>() {{
+    this(new ArrayList<String>() {{
            add(selectWithCount);
          }}, table, groupByColumn,
-        (modifier != null ? new ArrayList<>() {{
+        (modifier != null ? new ArrayList<Modifier>() {{
           add(modifier);
         }} : null));
   }
 
   public GroupByCount(String selectWithCount, String table, String groupByColumn) {
-    this(new ArrayList<>() {{
+    this(new ArrayList<String>() {{
       add(selectWithCount);
     }}, table, groupByColumn, null);
   }
 
-  public void setCountColumnMask(String countMask) {
+  protected void setCountColumnMask(String countMask) {
     this.countMask = countMask;
   }
 

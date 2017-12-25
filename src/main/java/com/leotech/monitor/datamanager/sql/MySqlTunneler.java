@@ -19,7 +19,7 @@ public class MySqlTunneler extends MySqlAccessor {
   }
 
   public MySqlTunneler() {
-    createConnection(defaultSSHConf, defaultMYSQLlConf, null);
+    createConnection(defaultSSHConf, defaultMYSQLConf, null);
   }
 
   public boolean createConnection(ConnectionConfig sshConn, ConnectionConfig mysqlConn, String database) {
