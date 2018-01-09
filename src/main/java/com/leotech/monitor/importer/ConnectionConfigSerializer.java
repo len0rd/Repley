@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder;
 import com.leotech.monitor.model.config.ConnectionConfig;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -14,9 +13,7 @@ import java.net.URISyntaxException;
 
 public class ConnectionConfigSerializer {
 
-  public ConnectionConfigSerializer() {
-
-  }
+  public ConnectionConfigSerializer() {}
 
   public ConnectionConfig importConnection(String filePathName) {
     ConnectionConfig connConfig = null;
@@ -72,7 +69,7 @@ public class ConnectionConfigSerializer {
 
   public void exportGenericConnection() {
     ConnectionConfig conf = new ConnectionConfig("localhost", 3306, "tyler",
-        "nerd", true);
+        "nerd", true, null);
     exportConnection(conf, "conf/defaultConnection.xml");
   }
 

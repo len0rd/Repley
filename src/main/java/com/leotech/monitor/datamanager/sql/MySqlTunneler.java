@@ -9,17 +9,12 @@ public class MySqlTunneler extends MySqlAccessor {
 
   private static final String REMOTE_HOST = "localhost";
   private static final int REMOTE_PORT = 3306;
-  public final ConnectionConfig defaultSSHConf = new ConnectionConfig("localhost", 22, "tyler",
-      "password", true);
+
   private Session sshSession;
 
 
   public MySqlTunneler(ConnectionConfig sshConn, ConnectionConfig mysqlConn) {
     createConnection(sshConn, mysqlConn, null);
-  }
-
-  public MySqlTunneler() {
-    createConnection(defaultSSHConf, defaultMYSQLConf, null);
   }
 
   public boolean createConnection(ConnectionConfig sshConn, ConnectionConfig mysqlConn, String database) {
@@ -44,10 +39,21 @@ public class MySqlTunneler extends MySqlAccessor {
       }
 
       JSch jsch = new JSch();
+      if (sshConn.getKey() != null && !sshConn.getKey().isEmpty()) {
+        if (sshConn.getPassword() != null) {
+          jsch.addIdentity(sshConn.getKey(), sshConn.getPassword());
+        } else {
+          jsch.addIdentity(sshConn.getKey());
+        }
+      }
       // Get SSH session
       System.out.println("Get Session");
       sshSession = jsch.getSession(sshConn.getUsername(), sshConn.getHost(), sshConn.getPort());
-      sshSession.setPassword(sshConn.getPassword());
+
+      if (sshConn.getKey() == null || sshConn.getKey().isEmpty()) {
+        sshSession.setPassword(sshConn.getPassword());
+      }
+
       java.util.Properties config = new java.util.Properties();
       // Never automatically add new host keys to the host file
       config.put("StrictHostKeyChecking", "no");

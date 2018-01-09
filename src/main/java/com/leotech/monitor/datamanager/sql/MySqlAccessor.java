@@ -10,8 +10,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class MySqlAccessor {
-  public final ConnectionConfig defaultMYSQLConf = new ConnectionConfig("localhost", 3306, "tyler",
-      "password", true);
   protected Connection conn = null;
 
   //default empty constructor

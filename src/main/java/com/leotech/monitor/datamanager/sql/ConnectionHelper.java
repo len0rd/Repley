@@ -28,7 +28,6 @@ public class ConnectionHelper {
     }
 
     if (tunnel != null && tunnel.isEnabled()) {
-      System.out.println("Tunnel conf is not null!!");
       accessor = new MySqlTunneler(tunnel, mysql);
     } else {
       accessor = new MySqlAccessor(mysql, database);

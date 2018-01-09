@@ -3,5 +3,6 @@
 	username:"root",
 	password:"nerd",
 	port:3306,
-	enabled:true
+	enabled:true,
+	key:"Users/user/.ssh/id_rsa"
 }
