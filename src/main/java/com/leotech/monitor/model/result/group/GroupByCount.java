@@ -4,6 +4,8 @@ import com.google.visualization.datasource.base.TypeMismatchException;
 import com.google.visualization.datasource.datatable.ColumnDescription;
 import com.google.visualization.datasource.datatable.DataTable;
 import com.google.visualization.datasource.datatable.value.ValueType;
+import com.leotech.monitor.datamanager.sql.ConnectionHelper;
+import com.leotech.monitor.datamanager.sql.MySqlAccessor;
 import com.leotech.monitor.datamanager.sql.MySqlTunneler;
 import com.leotech.monitor.model.modifier.Modifier;
 import com.leotech.monitor.model.modifier.ModifierContainer;
@@ -79,8 +81,8 @@ public class GroupByCount implements QueryResult {
     DataTable data = new DataTable();
     data.addColumns(cd);
 
-    MySqlTunneler queryManager = new MySqlTunneler();
-    //MySqlAccessor queryManager = new MySqlAccessor("localhost:3306", "scraper", "u23xhtu3");
+    ConnectionHelper ch = new ConnectionHelper();
+    MySqlAccessor queryManager = ch.getAccessor();
     System.out.println("query to run::" + query);
 
     SqlResult result = queryManager.getQueryResults(query, null);

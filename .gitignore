@@ -2,3 +2,6 @@
 *.DS_Store
 /out/
 /.gradle/
+/conf/ssh_connection.json
+/conf/mysql_connection.json
+/build/

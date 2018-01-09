@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/net.leotech_web-monitor.iml" filepath="$PROJECT_DIR$/.idea/modules/net.leotech_web-monitor.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/net.leotech_web-monitor_main.iml" filepath="$PROJECT_DIR$/.idea/modules/net.leotech_web-monitor_main.iml" group="net.leotech_web-monitor" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/net.leotech_web-monitor_test.iml" filepath="$PROJECT_DIR$/.idea/modules/net.leotech_web-monitor_test.iml" group="net.leotech_web-monitor" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/web_monitor.iml" filepath="$PROJECT_DIR$/.idea/modules/web_monitor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/web_monitor_main.iml" filepath="$PROJECT_DIR$/.idea/modules/web_monitor_main.iml" group="web_monitor" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/web_monitor_test.iml" filepath="$PROJECT_DIR$/.idea/modules/web_monitor_test.iml" group="web_monitor" />
     </modules>
   </component>
 </project>

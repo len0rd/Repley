@@ -1,45 +1,72 @@
 package com.leotech.monitor.importer;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.leotech.monitor.model.config.ConnectionConfig;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.net.URISyntaxException;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 
 public class ConnectionConfigSerializer {
 
-  private final JAXBContext context;
-
   public ConnectionConfigSerializer() {
-    JAXBContext temp = null;
-    try {
-      temp = JAXBContext.newInstance(ConnectionConfig.class);
-    } catch (Exception e) {
-      e.printStackTrace();
-    } finally {
-      this.context = temp;
-    }
+
   }
 
   public ConnectionConfig importConnection(String filePathName) {
     ConnectionConfig connConfig = null;
+    BufferedReader reader = null;
+    File readin = null;
+
     try {
-      final Unmarshaller unmarshaller = context.createUnmarshaller();
-      connConfig = (ConnectionConfig) unmarshaller.unmarshal(new File(filePathName));
-    } catch (Exception e) {
+      readin = new File(getAbsolutePath() + filePathName);
+    } catch (URISyntaxException e) {
+      System.out.println("Err while trying to get file path");
       e.printStackTrace();
+    }
+
+    if (readin != null && readin.exists()) {
+      try {
+        reader = new BufferedReader(new FileReader(readin));
+        Gson gson = new GsonBuilder().create();
+        connConfig = gson.fromJson(reader, ConnectionConfig.class);
+
+      } catch (Exception  e) {
+        System.out.println("Something went wrong trying to import the connection json");
+        e.printStackTrace();
+      } finally {
+        if (reader != null) {
+          try {
+            reader.close();
+          } catch (Exception ignored) {}
+        }
+      }
     }
 
     return connConfig;
   }
 
   public void exportConnection(ConnectionConfig configToExport, String outputFilePathName) {
+    Writer writer = null;
+
     try {
-      final Marshaller marshaller = context.createMarshaller();
-      marshaller.marshal(configToExport, new File(outputFilePathName));
+      writer = new FileWriter(getAbsolutePath() + outputFilePathName);
+      Gson gson = new GsonBuilder().create();
+      gson.toJson(configToExport, writer);
+
     } catch (Exception e) {
       e.printStackTrace();
+    } finally {
+      if (writer != null) {
+        try {
+          writer.close();
+        } catch (IOException ignored) {}
+      }
     }
   }
 
