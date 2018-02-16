@@ -17,12 +17,12 @@ public class Row {
 
   public Row populate(ResultSet rs, List<String> columnNames, List<Integer> sqlTypes) {
     for (int i = 0; i < columnNames.size(); i++) {
-      keyValues.add(addTuple(rs, i + 1, columnNames.get(i), sqlTypes.get(i)));
+      keyValues.add(addTuple(rs, columnNames.get(i), sqlTypes.get(i)));
     }
     return this;
   }
 
-  private Tuple addTuple(ResultSet rs, int index, String columnName, int type) {
+  private Tuple addTuple(ResultSet rs, String columnName, int type) {
     try {
       switch (type) {
         case Types.INTEGER:
@@ -30,18 +30,18 @@ public class Row {
         case Types.SMALLINT:
         case Types.BIGINT:
         case Types.NUMERIC:
-          return new Tuple(columnName, rs.getInt(index), Types.INTEGER);
+          return new Tuple<>(columnName, rs.getInt(columnName));
         case Types.BOOLEAN:
-          return new Tuple(columnName, rs.getBoolean(index), Types.BOOLEAN);
+          return new Tuple<>(columnName, rs.getBoolean(columnName));
         case Types.DECIMAL:
         case Types.DOUBLE:
-          return new Tuple(columnName, rs.getDouble(index), Types.DOUBLE);
+          return new Tuple<>(columnName, rs.getDouble(columnName));
         case Types.FLOAT:
-          return new Tuple(columnName, rs.getFloat(index), Types.FLOAT);
+          return new Tuple<>(columnName, rs.getFloat(columnName));
         case Types.NULL:
-          return new Tuple(columnName, null, Types.VARCHAR);
+          return new Tuple<>(columnName, (String) null);
         default:
-          return new Tuple(columnName, rs.getString(index), Types.VARCHAR);
+          return new Tuple<>(columnName, rs.getString(columnName));
       }
     } catch (SQLException se) {
       System.out.println("ERR::Couldn't create a new Tuple");
@@ -62,30 +62,11 @@ public class Row {
   public JSONObject toJSONObject() {
     JSONObject out = new JSONObject();
     for (Tuple t : keyValues) {
-      addKeyValue(out, t);
+      out.put(t.getKey(), t.getValue());
     }
     return out;
   }
 
-  private void addKeyValue(JSONObject jo, Tuple t) {
-    switch (t.getBasicSqlType()) {
-      case Types.INTEGER:
-        jo.put(t.getKey(), (int) t.getValue());
-        break;
-      case Types.BOOLEAN:
-        jo.put(t.getKey(), (boolean) t.getValue());
-        break;
-      case Types.DOUBLE:
-        jo.put(t.getKey(), (double) t.getValue());
-        break;
-      case Types.FLOAT:
-        jo.put(t.getKey(), (float) t.getValue());
-        break;
-      default:
-        jo.put(t.getKey(), (String) t.getValue());
-        break;
-    }
-  }
 
 }
 
