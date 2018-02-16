@@ -1,7 +1,7 @@
 {
-	host:"localhost",
-	username:"root",
-	password:"nerd",
-	port:3306,
-	enabled:true
+	"host":"localhost",
+	"username":"root",
+	"password":"nerd",
+	"port":3306,
+	"enabled":true
 }

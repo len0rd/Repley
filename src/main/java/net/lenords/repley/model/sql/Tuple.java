@@ -1,4 +1,4 @@
-package net.lenords.reporter.model.sql;
+package net.lenords.repley.model.sql;
 
 public class Tuple<T> {
 

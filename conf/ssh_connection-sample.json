@@ -1,8 +1,8 @@
 {
-	host:"localhost",
-	username:"root",
-	password:"nerd",
-	port:3306,
-	enabled:true,
-	key:"Users/user/.ssh/id_rsa"
+	"host":"localhost",
+	"username":"root",
+	"password":"nerd",
+	"port":3306,
+	"enabled":true,
+	"key":"Users/user/.ssh/id_rsa"
 }

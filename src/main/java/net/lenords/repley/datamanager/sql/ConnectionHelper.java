@@ -1,7 +1,7 @@
-package net.lenords.reporter.datamanager.sql;
+package net.lenords.repley.datamanager.sql;
 
-import net.lenords.reporter.model.conf.ConnectionConfig;
-import net.lenords.reporter.serial.ConnectionConfigSerializer;
+import net.lenords.repley.model.conf.ConnectionConfig;
+import net.lenords.repley.serial.ConnectionConfigSerializer;
 
 /**
  * The purpose of this class is to automatically setup the proper MySql accessor (either a normal

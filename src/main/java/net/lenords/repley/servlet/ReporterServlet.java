@@ -1,4 +1,4 @@
-package net.lenords.reporter.servlet;
+package net.lenords.repley.servlet;
 
 import java.io.IOException;
 import javax.servlet.ServletException;

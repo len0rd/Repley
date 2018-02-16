@@ -1,4 +1,4 @@
-package net.lenords.reporter.model.sql;
+package net.lenords.repley.model.sql;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

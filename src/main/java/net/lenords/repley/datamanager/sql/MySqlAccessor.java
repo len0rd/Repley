@@ -1,4 +1,4 @@
-package net.lenords.reporter.datamanager.sql;
+package net.lenords.repley.datamanager.sql;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -6,8 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import net.lenords.reporter.model.conf.ConnectionConfig;
-import net.lenords.reporter.model.sql.SqlResult;
+import net.lenords.repley.model.conf.ConnectionConfig;
+import net.lenords.repley.model.sql.SqlResult;
 
 public class MySqlAccessor {
   protected Connection conn = null;
@@ -108,6 +108,10 @@ public class MySqlAccessor {
     }
 
     return result;
+  }
+
+  public SqlResult getQueryResults(String sqlQuery) {
+    return getQueryResults(sqlQuery, null);
   }
 
   public void close() {

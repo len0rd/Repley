@@ -1,4 +1,4 @@
-package net.lenords.reporter.serial;
+package net.lenords.repley.serial;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -9,19 +9,19 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.net.URISyntaxException;
-import net.lenords.reporter.model.conf.ConnectionConfig;
+import net.lenords.repley.model.conf.ConnectionConfig;
 
 public class ConnectionConfigSerializer {
 
   public ConnectionConfigSerializer() {}
 
-  public ConnectionConfig importConnection(String filePathName) {
+  public ConnectionConfig importConnection(String relativeFilePathName) {
     ConnectionConfig connConfig = null;
     BufferedReader reader = null;
     File readin = null;
 
     try {
-      readin = new File(getAbsolutePath() + filePathName);
+      readin = new File(getAbsolutePath() + relativeFilePathName);
     } catch (URISyntaxException e) {
       System.out.println("Err while trying to get file path");
       e.printStackTrace();
@@ -48,6 +48,10 @@ public class ConnectionConfigSerializer {
     return connConfig;
   }
 
+  public ConnectionConfig importDefaultConnection() {
+    return importConnection("conf/ssh_connection.json");
+  }
+
   public void exportConnection(ConnectionConfig configToExport, String outputFilePathName) {
     Writer writer = null;
 
@@ -68,9 +72,9 @@ public class ConnectionConfigSerializer {
   }
 
   public void exportGenericConnection() {
-    ConnectionConfig conf = new ConnectionConfig("localhost", 3306, "tyler",
+    ConnectionConfig conf = new ConnectionConfig("localhost", 3306, "root",
         "nerd", true, null);
-    exportConnection(conf, "conf/defaultConnection.xml");
+    exportConnection(conf, "conf/default_connection.json");
   }
 
   private String getAbsolutePath() throws URISyntaxException {

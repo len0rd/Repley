@@ -1,9 +1,9 @@
-package net.lenords.reporter.datamanager.sql;
+package net.lenords.repley.datamanager.sql;
 
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import java.net.ServerSocket;
-import net.lenords.reporter.model.conf.ConnectionConfig;
+import net.lenords.repley.model.conf.ConnectionConfig;
 
 public class MySqlTunneler extends MySqlAccessor {
 

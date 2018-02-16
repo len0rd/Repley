@@ -1,4 +1,4 @@
-package net.lenords.reporter.model.conf;
+package net.lenords.repley.model.conf;
 
 public class ConnectionConfig {
 
