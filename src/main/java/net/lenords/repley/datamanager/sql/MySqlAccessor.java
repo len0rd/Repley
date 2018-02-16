@@ -9,7 +9,7 @@ import java.util.List;
 import net.lenords.repley.model.conf.ConnectionConfig;
 import net.lenords.repley.model.sql.SqlResult;
 
-public class MySqlAccessor {
+public class MySqlAccessor implements Accessor{
   protected Connection conn = null;
 
   //default empty constructor
@@ -73,10 +73,27 @@ public class MySqlAccessor {
     return true;
   }
 
-  public SqlResult getQueryResults(String sqlQuery, List<String> orderedStringParams) {
-    PreparedStatement ps = null;
-    ResultSet rs = null;
+  @Override
+  public Connection getConn() {
+    return conn;
+  }
+
+  @Override
+  public SqlResult getQueryResult(PreparedStatement ps) {
     SqlResult result = new SqlResult();
+
+    try (ResultSet rs = ps.executeQuery()) {
+      result.populate(rs, rs.getMetaData());
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return result;
+  }
+
+  @Override
+  public SqlResult getQueryResult(String sqlQuery, List<String> orderedStringParams) {
+    PreparedStatement ps = null;
+    SqlResult result = null;
 
     try {
       ps = conn.prepareStatement(sqlQuery);
@@ -86,34 +103,29 @@ public class MySqlAccessor {
           ps.setString(i + 1, orderedStringParams.get(i));
         }
       }
-      rs = ps.executeQuery();
-      result.populate(rs, rs.getMetaData());
+      result = getQueryResult(ps);
     } catch (Exception e) {
       System.out.println("ERR::Failed to get query results for this query:");
       System.out.println(sqlQuery);
       e.printStackTrace();
     } finally {
-      if (rs != null) {
-        try {
-          rs.close();
-        } catch (SQLException ignored) {
-        }
-      }
       if (ps != null) {
         try {
           ps.close();
-        } catch (SQLException ignored) {
-        }
+        } catch (SQLException ignored) {}
       }
     }
 
     return result;
   }
 
-  public SqlResult getQueryResults(String sqlQuery) {
-    return getQueryResults(sqlQuery, null);
+  @Override
+  public SqlResult getQueryResult(String sqlQuery) {
+    return getQueryResult(sqlQuery, null);
   }
 
+
+  @Override
   public void close() {
     if (conn != null) {
       try {
@@ -123,4 +135,6 @@ public class MySqlAccessor {
 
     }
   }
+
+
 }
