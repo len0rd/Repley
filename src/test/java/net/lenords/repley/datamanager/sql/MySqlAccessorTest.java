@@ -1,7 +1,9 @@
 package net.lenords.repley.datamanager.sql;
 
+import net.lenords.repley.model.conf.ConnectionConfig;
 import net.lenords.repley.model.sql.Row;
 import net.lenords.repley.model.sql.SqlResult;
+import net.lenords.repley.serial.ConnectionConfigSerializer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,9 +15,12 @@ public class MySqlAccessorTest {
 
   @BeforeEach
   public void setup() {
-    ConnectionHelper ch = new ConnectionHelper("res_stat");
-    Assertions.assertNotNull(ch, "Failed to initialize SQL connection helper!");
-    accessor = ch.getAccessor();
+    //Running the tests generally takes place in a differnt location than normal
+    //TODO: ideally find a better way to do this
+    ConnectionConfigSerializer ccs = new ConnectionConfigSerializer();
+    ConnectionConfig cc = ccs.importConnection("../../../conf/mysql_connection.json");
+    Assertions.assertNotNull(cc, "Failed to import connection config!");
+    accessor = new MySqlAccessor(cc, "re_stat");
   }
 
   @AfterEach

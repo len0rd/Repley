@@ -49,14 +49,16 @@ public class ConnectionConfigSerializer {
   }
 
   public ConnectionConfig importDefaultConnection() {
-    return importConnection("conf/ssh_connection.json");
+    return importConnection("conf/mysql_connection.json");
   }
 
   public void exportConnection(ConnectionConfig configToExport, String outputFilePathName) {
     Writer writer = null;
 
+
     try {
-      writer = new FileWriter(getAbsolutePath() + outputFilePathName);
+      String pathToTry = getAbsolutePath() + outputFilePathName;
+      writer = new FileWriter(pathToTry);
       Gson gson = new GsonBuilder().create();
       gson.toJson(configToExport, writer);
 
