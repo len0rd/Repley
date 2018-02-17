@@ -22,7 +22,6 @@ public class ReporterServlet extends HttpServlet {
     System.out.println(jsonResult);
     response.setContentType("application/json");
     response.getWriter().write(jsonResult);
-
     */
 
   }
