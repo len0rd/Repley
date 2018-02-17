@@ -27,3 +27,26 @@ dependencies {
     testCompile('org.junit.jupiter:junit-jupiter-api:5.0.1')
     testRuntime('org.junit.jupiter:junit-jupiter-engine:5.0.1')
 }
+
+task createJar(type: Jar) {
+    baseName = 'reporter'
+    from {
+        (configurations.runtime).collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    with jar
+}
+
+task copyJarToTomcat(type: Copy) {
+    from createJar //copy build into tomcat server folder
+    into "/Library/Tomcat/webapps/repley/WEB-INF/lib"
+}
+
+task copyWebToTomcat(type: Copy) {
+    from "web/"
+    into "/Library/Tomcat/webapps/repley"
+}
+
+//build servlet: update the jar in tomcat
+task buildlet (dependsOn: [createJar, copyWebToTomcat, copyJarToTomcat])

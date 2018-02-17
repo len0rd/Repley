@@ -31,7 +31,7 @@ public class MySqlAccessorTest {
 
   @Test
   public void resultPopulation() {
-    SqlResult result = accessor.getQueryResults("SELECT * FROM export_totals");
+    SqlResult result = accessor.getQueryResult("SELECT * FROM export_totals");
     Assertions.assertNotNull(result, "Accessor returned null result");
     Assertions.assertFalse(result.isEmpty(), "Accessor query result is empty!");
     for (Row row : result.getRows()) {
