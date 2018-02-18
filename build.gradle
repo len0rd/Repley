@@ -53,10 +53,8 @@ task stopTomcat(type: Exec) {
     commandLine './shutdown.sh'
 }
 task startTomcat(type: Exec) {
-    doLast {
-        workingDir '/Library/Tomcat/bin'
-        commandLine './startup.sh'
-    }
+    workingDir '/Library/Tomcat/bin'
+    commandLine './startup.sh'
 }
 
 //build servlet: update the jar in tomcat
