@@ -24,7 +24,7 @@ public class ReporterServlet extends HttpServlet {
       response.setCharacterEncoding("UTF-8");
       response.getWriter().write(data);
     } else {
-      int[] dataPnts = {1, 3, 5, 4, 2, 6, 7};
+      int[] dataPnts = {1, 3, 5, 4, 2, 6};
       Gson gson = new Gson();
 
       String jsonResult = gson.toJson(dataPnts);

@@ -1,0 +1,31 @@
+{
+  "queryModels": [
+    {
+      "name":"funnel",
+      "params": {
+        "required":["byo", "CHANGE_ME"],
+        "optional":[]
+      },
+      "data_labels":["seen", "new", "processable", "staged", "complete"],
+      "query": {
+        "sql": "SELECT * FROM re..."
+      }
+    },
+    {
+      "name":"getstage",
+      "params": {
+        "required":["byo", "end"],
+        "optional":["dateName", "p1date", "p1date_f"]
+      },
+      "query": {
+        "sql": "SELECT stage, COUNT(*) FROM re_%byo_%end (WHERE %dateName = %p1date) GROUP BY stage",
+        "mappings": [
+          {
+            "column": 0,
+            "mapto":"data.labels"
+          }
+        ]
+      }
+    }
+  ]
+}
