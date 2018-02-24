@@ -5,7 +5,7 @@ public class Chart {
   private ChartData data;
 
   public Chart(ChartType type, ChartData data) {
-    this.type = type.name().toLowerCase();
+    this.type = type.getTypeString();
     this.data = data;
   }
 
