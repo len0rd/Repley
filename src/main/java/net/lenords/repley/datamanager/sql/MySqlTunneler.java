@@ -3,7 +3,8 @@ package net.lenords.repley.datamanager.sql;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import java.net.ServerSocket;
-import net.lenords.repley.model.conf.ConnectionConfig;
+import net.lenords.repley.model.conf.MySqlConnectionConfig;
+import net.lenords.repley.model.conf.SshConnectionConfig;
 
 public class MySqlTunneler extends MySqlAccessor {
 
@@ -13,15 +14,18 @@ public class MySqlTunneler extends MySqlAccessor {
   private Session sshSession;
 
 
-  public MySqlTunneler(ConnectionConfig sshConn, ConnectionConfig mysqlConn) {
-    createConnection(sshConn, mysqlConn, null);
+  public MySqlTunneler(SshConnectionConfig sshConn, MySqlConnectionConfig mysqlConn) {
+    createConnection(sshConn, mysqlConn);
   }
 
-  public boolean createConnection(ConnectionConfig sshConn, ConnectionConfig mysqlConn, String database) {
-    assert mysqlConn.getPort() != 3306;
+  public boolean createConnection(SshConnectionConfig sshConn, MySqlConnectionConfig mysqlConn) {
+    //assert mysqlConn.getPort() != 3306; //WHY?? What was i doing...
 
     try {
+
       //get a random available port for our ssh/mysql tunnel
+      //the ssh tunnel will forward all info to that port, so mysql can connect to it as
+      //'localhost:PORT'
       ServerSocket socket = null;
       try {
         socket = new ServerSocket(0);
@@ -39,19 +43,19 @@ public class MySqlTunneler extends MySqlAccessor {
       }
 
       JSch jsch = new JSch();
-      if (sshConn.getKey() != null && !sshConn.getKey().isEmpty()) {
-        if (sshConn.getPassword() != null) {
-          jsch.addIdentity(sshConn.getKey(), sshConn.getPassword());
+      if (sshConn.hasKey()) {
+        if (sshConn.hasPass()) {
+          jsch.addIdentity(sshConn.getKey(), sshConn.getPass());
         } else {
           jsch.addIdentity(sshConn.getKey());
         }
       }
       // Get SSH session
       System.out.println("Get Session");
-      sshSession = jsch.getSession(sshConn.getUsername(), sshConn.getHost(), sshConn.getPort());
+      sshSession = jsch.getSession(sshConn.getUser(), sshConn.getHost(), sshConn.getPort());
 
-      if (sshConn.getKey() == null || sshConn.getKey().isEmpty()) {
-        sshSession.setPassword(sshConn.getPassword());
+      if (!sshConn.hasKey()) {
+        sshSession.setPassword(sshConn.getPass());
       }
 
       java.util.Properties config = new java.util.Properties();
@@ -66,7 +70,7 @@ public class MySqlTunneler extends MySqlAccessor {
       System.out.println("Set Port forwarding");
       sshSession.setPortForwardingL(mysqlConn.getPort(), REMOTE_HOST, REMOTE_PORT);
       // Connect to remote database
-      return super.createConnection(mysqlConn, database);
+      return super.createConnection(mysqlConn);
     } catch (Exception e) {
       e.printStackTrace();
     }

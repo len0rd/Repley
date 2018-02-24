@@ -1,6 +1,10 @@
 package net.lenords.repley.datamanager.sql;
 
-import net.lenords.repley.model.conf.ConnectionConfig;
+import com.google.gson.Gson;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import net.lenords.repley.model.conf.MySqlConnectionConfig;
+import net.lenords.repley.model.conf.SshConnectionConfig;
 import net.lenords.repley.serial.ConnectionConfigSerializer;
 
 /**
@@ -15,31 +19,37 @@ public class ConnectionHelper {
 
   private MySqlAccessor accessor;
 
-  public ConnectionHelper(String tunnelConf, String mysqlConf, String database) {
+  public ConnectionHelper(String tunnelConf, String mysqlConf) {
     ConnectionConfigSerializer ccs = new ConnectionConfigSerializer();
+    Gson gson = new Gson();
 
-    ConnectionConfig mysql = ccs.importConnection(mysqlConf);
-    System.out.println(mysql.toString());
-    ConnectionConfig tunnel = null; //its possible and reasonable that this config wont exist
+    SshConnectionConfig sshConf = null;
+    MySqlConnectionConfig mysqlConn = null;
+    try  {
+      mysqlConn = gson.fromJson(new FileReader(mysqlConf), MySqlConnectionConfig.class);
+
+    } catch (FileNotFoundException e) {
+      System.out.println("ERR:: Failed to find mysql config. Any query attempt will fail");
+      e.printStackTrace();
+      this.accessor = null;
+      return;
+    }
+
     try {
-      tunnel = ccs.importConnection(tunnelConf);
-    } catch (Exception e) {
-      System.out.println("ERR::Failed to import the tunnel connection config, proceeding without one");
+      sshConf = gson.fromJson(new FileReader(tunnelConf), SshConnectionConfig.class);
+    } catch (FileNotFoundException e) {
+      System.out.println("Warn:: Failed to import ssh config. proceeding without one.");
     }
 
-    if (tunnel != null && tunnel.isEnabled()) {
-      accessor = new MySqlTunneler(tunnel, mysql);
-    } else {
-      accessor = new MySqlAccessor(mysql, database);
+    if (sshConf != null && sshConf.isEnabled()) {
+      accessor = new MySqlTunneler(sshConf, mysqlConn);
+    } else { //if we dont have an enabled ssh connection, then we only want direct mysql access
+      accessor = new MySqlAccessor(mysqlConn);
     }
-  }
-
-  public ConnectionHelper(String database) {
-    this(DEFAULT_TUNNEL_CONF_LOCATION, DEFAULT_MYSQL_CONF_LOCATION, database);
   }
 
   public ConnectionHelper() {
-    this(DEFAULT_TUNNEL_CONF_LOCATION, DEFAULT_MYSQL_CONF_LOCATION, null);
+    this(DEFAULT_TUNNEL_CONF_LOCATION, DEFAULT_MYSQL_CONF_LOCATION);
   }
 
   public MySqlAccessor getAccessor() {

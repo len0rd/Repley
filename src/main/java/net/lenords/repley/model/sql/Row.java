@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Row {
@@ -58,11 +59,19 @@ public class Row {
     return keyValues == null || keyValues.isEmpty();
   }
 
-
   public JSONObject toJSONObject() {
     JSONObject out = new JSONObject();
     for (Tuple t : keyValues) {
       out.put(t.getKey(), t.getValue());
+    }
+    return out;
+  }
+
+  public JSONArray valuesToArray() {
+    JSONArray out = new JSONArray();
+    //TODO: type checks here. values need to all be same type, right?
+    for (Tuple t : keyValues) {
+      out.put(t.getValue());
     }
     return out;
   }

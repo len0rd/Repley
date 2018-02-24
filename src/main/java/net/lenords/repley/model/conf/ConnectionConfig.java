@@ -1,19 +1,17 @@
 package net.lenords.repley.model.conf;
 
 public class ConnectionConfig {
-
-  private String host, username, password, key;
+  private String host, user, pass;
   private int port;
   private boolean enabled;
 
-  public ConnectionConfig(String host, int port, String username, String password,
-      boolean enabled, String key) {
+
+  public ConnectionConfig(String host, String user, String pass, int port, boolean enabled) {
     this.host = host;
+    this.user = user;
+    this.pass = pass;
     this.port = port;
-    this.username = username;
-    this.password = password;
     this.enabled = enabled;
-    this.key = key;
   }
 
   public String getHost() {
@@ -24,28 +22,24 @@ public class ConnectionConfig {
     this.host = host;
   }
 
-  public boolean isEnabled() {
-    return enabled;
+  public String getUser() {
+    return user;
   }
 
-  public void setEnabled(boolean enabled) {
-    this.enabled = enabled;
+  public void setUser(String user) {
+    this.user = user;
   }
 
-  public String getUsername() {
-    return username;
+  public String getPass() {
+    return pass;
   }
 
-  public void setUsername(String username) {
-    this.username = username;
+  public void setPass(String pass) {
+    this.pass = pass;
   }
 
-  public String getPassword() {
-    return password;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
+  public boolean hasPass() {
+    return pass != null && !pass.isEmpty();
   }
 
   public int getPort() {
@@ -56,26 +50,21 @@ public class ConnectionConfig {
     this.port = port;
   }
 
-  public String getStringPort() {
-    return String.valueOf(port);
-  }
-
-  public String getKey() {
-    return key;
-  }
-
-  public void setKey(String key) {
-    this.key = key;
-  }
-
   @Override
   public String toString() {
     return "ConnectionConfig{" +
         "host='" + host + '\'' +
-        ", username='" + username + '\'' +
-        ", password='" + password + '\'' +
+        ", user='" + user + '\'' +
+        ", pass='" + pass + '\'' +
         ", port=" + port +
-        ", enabled=" + enabled +
         '}';
+  }
+
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
   }
 }

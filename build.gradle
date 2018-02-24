@@ -48,6 +48,11 @@ task copyWebToTomcat(type: Copy) {
     into "/Library/Tomcat/webapps/repley"
 }
 
+task copyConfToTomcat(type: Copy) {
+    from "conf/"
+    into "/Library/Tomcat/webapps/repley/WEB-INF/lib/conf"
+}
+
 task stopTomcat(type: Exec) {
     workingDir '/Library/Tomcat/bin'
     commandLine './shutdown.sh'
@@ -58,4 +63,4 @@ task startTomcat(type: Exec) {
 }
 
 //build servlet: update the jar in tomcat
-task buildlet (dependsOn: [stopTomcat, createJar, copyWebToTomcat, copyJarToTomcat, startTomcat])
+task buildlet (dependsOn: [stopTomcat, createJar, copyWebToTomcat, copyConfToTomcat, copyJarToTomcat, startTomcat])

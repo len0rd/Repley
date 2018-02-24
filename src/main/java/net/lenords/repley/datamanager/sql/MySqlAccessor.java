@@ -6,65 +6,30 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import net.lenords.repley.model.conf.ConnectionConfig;
+import net.lenords.repley.model.conf.MySqlConnectionConfig;
 import net.lenords.repley.model.sql.SqlResult;
 
-public class MySqlAccessor implements Accessor{
+public class MySqlAccessor implements Accessor {
   protected Connection conn = null;
 
   //default empty constructor
   public MySqlAccessor() {}
 
-  public MySqlAccessor(ConnectionConfig conf, String database) {
-    this.createConnection(conf, database);
+  public MySqlAccessor(MySqlConnectionConfig conf) {
+    this.createConnection(conf);
   }
 
-  public MySqlAccessor(String url, String user, String password) {
-    this.createConnection(url, user, password);
-  }
-
-  /**
-   *
-   *
-   * @param host Formatted as Address:Port/database_name
-   * @param user Mysql username to use
-   * @param pass Mysql password to use
-   * @return True if the connection was successfully created, otherwise dalse
-   */
-  public boolean createConnection(String host, String user, String pass) {
-    //close our connection if it's already been created
-    try {
-      this.close();
-    } catch (Exception ignored) {
-    }
-
-    try {
-      DriverManager.registerDriver(new com.mysql.jdbc.Driver());
-      //Class.forName("com.mysql.jdbc.Driver");
-      conn = DriverManager.getConnection("jdbc:mysql://" + host, user, pass);
-    } catch (Exception e) {
-      System.out.println("Failed to instantiate connection!");
-      return false;
-    }
-
-    return true;
-  }
-
-  public boolean createConnection(ConnectionConfig conf, String database) {
+  public boolean createConnection(MySqlConnectionConfig conf) {
     //close our connection if it's already been created
     try { //chances of throwing very low
       this.close();
-    } catch (Exception ignored) {
-    }
+    } catch (Exception ignored) {}
 
-    String host = "jdbc:mysql://" + conf.getHost() + ":" + conf.getPort();
-    if (database != null && !database.isEmpty()) {
-      host += "/" + database;
-    }
     try {
       DriverManager.registerDriver(new com.mysql.jdbc.Driver());
       //Class.forName("com.mysql.jdbc.Driver");
-      conn = DriverManager.getConnection(host, conf.getUsername(), conf.getPassword());
+      conn = DriverManager.getConnection("jdbc:mysql://" + conf.getFullHost(),
+            conf.getUser(), conf.getPass());
     } catch (Exception e) {
       System.out.println("Failed to instantiate connection!");
       return false;
