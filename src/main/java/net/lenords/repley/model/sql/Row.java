@@ -67,6 +67,21 @@ public class Row {
     return out;
   }
 
+  public Integer[] getValues() {
+    Integer[] values = new Integer[keyValues.size()];
+    System.out.println("get values");
+    for (int i = 0; i < keyValues.size(); i++) {
+      try {
+        values[i] = (int) keyValues.get(i).getValue();
+      } catch (ClassCastException cce) {
+        cce.printStackTrace();
+        values[i] = -1;
+      }
+      System.out.println("got " + values[i]);
+    }
+    return values;
+  }
+
   public JSONArray valuesToArray() {
     JSONArray out = new JSONArray();
     //TODO: type checks here. values need to all be same type, right?
