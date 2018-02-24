@@ -15,6 +15,7 @@ import net.lenords.repley.datamanager.sql.ConnectionHelper;
 import net.lenords.repley.model.chart.Chart;
 import net.lenords.repley.model.chart.ChartData;
 import net.lenords.repley.model.chart.ChartDataset;
+import net.lenords.repley.model.chart.ChartType;
 import net.lenords.repley.model.sql.SqlResult;
 import org.json.JSONArray;
 
@@ -38,15 +39,13 @@ public class ReporterServlet extends HttpServlet {
       System.out.println("Queried");
 
       if (!result.isEmpty()) {
-        System.out.println("result isnt empty");
         List<Integer> data = Arrays.asList(result.getRows().get(0).getValues());
-        System.out.println(data.toString());
         ChartDataset cds = new ChartDataset("# of ads", data);
         cds.setBorderWidth(1);
         cds.generateRandomColorsForDataset();
         ChartData cd = new ChartData(Arrays.asList("est", "cst", "mst", "pst"),
             Collections.singletonList(cds));
-        Chart chart = new Chart("pie", cd);
+        Chart chart = new Chart(ChartType.DOUGHNUT, cd);
         System.out.println("Built Chart");
         Gson gson = new Gson();
 

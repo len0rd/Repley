@@ -4,8 +4,8 @@ public class Chart {
   private String type;
   private ChartData data;
 
-  public Chart(String type, ChartData data) {
-    this.type = type;
+  public Chart(ChartType type, ChartData data) {
+    this.type = type.name().toLowerCase();
     this.data = data;
   }
 
