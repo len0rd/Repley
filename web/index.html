@@ -23,14 +23,15 @@ Hello there!
   }
 
   function loadChart(responseText) {
+    alert(responseText);
     var ctx = document.getElementById("myChart").getContext('2d');
     var myChart = new Chart(ctx,
         {
-          type: 'line',
+          type: 'pie',
           data: {
-            labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+            labels: ["est", "cst", "mst", "pst"],
             datasets: [{
-              label: '# of Votes',
+              label: '# of ads',
               data: responseText,
               backgroundColor: [
                 'rgba(255, 99, 132, 0.2)'
@@ -39,27 +40,7 @@ Hello there!
                 'rgba(255,99,132,1)'
               ],
               borderWidth: 1
-            },
-              {
-                label: '# of People',
-                data: [3, 19, 15, 2, 2, 10],
-                backgroundColor: [
-                  'rgba(10,15,255,0.1)'
-                ],
-                borderColor: [
-                  'rgba(10,15,255,1)'
-                ],
-                borderWidth: 1
-              }]
-          },
-          options: {
-            scales: {
-              yAxes: [{
-                ticks: {
-                  beginAtZero:true
-                }
-              }]
-            }
+            }]
           }
         });
   }

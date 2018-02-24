@@ -11,6 +11,7 @@ import net.lenords.repley.model.sql.SqlResult;
 
 public class MySqlAccessor implements Accessor {
   protected Connection conn = null;
+  private MySqlConnectionConfig config;
 
   //default empty constructor
   public MySqlAccessor() {}
@@ -20,6 +21,7 @@ public class MySqlAccessor implements Accessor {
   }
 
   public boolean createConnection(MySqlConnectionConfig conf) {
+    this.config = conf;
     //close our connection if it's already been created
     try { //chances of throwing very low
       this.close();
@@ -102,4 +104,7 @@ public class MySqlAccessor implements Accessor {
   }
 
 
+  public MySqlConnectionConfig getConfig() {
+    return config;
+  }
 }

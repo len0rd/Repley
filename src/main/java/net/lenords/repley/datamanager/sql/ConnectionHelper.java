@@ -1,11 +1,12 @@
 package net.lenords.repley.datamanager.sql;
 
 import com.google.gson.Gson;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.net.URISyntaxException;
 import net.lenords.repley.model.conf.MySqlConnectionConfig;
 import net.lenords.repley.model.conf.SshConnectionConfig;
-import net.lenords.repley.serial.ConnectionConfigSerializer;
 
 /**
  * The purpose of this class is to automatically setup the proper MySql accessor (either a normal
@@ -20,24 +21,36 @@ public class ConnectionHelper {
   private MySqlAccessor accessor;
 
   public ConnectionHelper(String tunnelConf, String mysqlConf) {
-    ConnectionConfigSerializer ccs = new ConnectionConfigSerializer();
     Gson gson = new Gson();
 
     SshConnectionConfig sshConf = null;
     MySqlConnectionConfig mysqlConn = null;
     try  {
-      mysqlConn = gson.fromJson(new FileReader(mysqlConf), MySqlConnectionConfig.class);
+      mysqlConn = gson.fromJson(new FileReader(getAbsolutePath() + mysqlConf), MySqlConnectionConfig.class);
 
     } catch (FileNotFoundException e) {
       System.out.println("ERR:: Failed to find mysql config. Any query attempt will fail");
       e.printStackTrace();
       this.accessor = null;
       return;
+    } catch (URISyntaxException e) {
+      System.out.println("ERR:: Failed to load mysql conf, something wrong with pathfinding.");
+      e.printStackTrace();
+      this.accessor = null;
+      return;
     }
 
-    try {
-      sshConf = gson.fromJson(new FileReader(tunnelConf), SshConnectionConfig.class);
-    } catch (FileNotFoundException e) {
+    if (tunnelConf != null) {
+      try {
+        sshConf = gson.fromJson(new FileReader(getAbsolutePath() + tunnelConf), SshConnectionConfig.class);
+      } catch (FileNotFoundException e) {
+        System.out.println("Warn:: Failed to import ssh config. proceeding without one.");
+      } catch (URISyntaxException e) {
+        System.out.println("ERR:: Failed to load ssh conf, something wrong with pathfinding. "
+            + "Attempting to proceed without one.");
+        e.printStackTrace();
+      }
+    } else {
       System.out.println("Warn:: Failed to import ssh config. proceeding without one.");
     }
 
@@ -54,6 +67,19 @@ public class ConnectionHelper {
 
   public MySqlAccessor getAccessor() {
     return accessor;
+  }
+
+
+  private String getAbsolutePath() throws URISyntaxException {
+    String path = getAbsoluteJarFilePath();
+    path = path.substring(0, path.lastIndexOf(File.separator) + 1);
+    return path;
+  }
+
+  private String getAbsoluteJarFilePath() throws URISyntaxException {
+    return ConnectionHelper.class.getProtectionDomain().getCodeSource().getLocation()
+        .toURI()
+        .getPath();
   }
 
 }

@@ -58,4 +58,16 @@ public class MySqlConnectionConfig extends ConnectionConfig {
 
     return fullName;
   }
+
+  @Override
+  public String toString() {
+    return "MySqlConnectionConfig{" +
+        "host='" + getHost() + '\'' +
+        ", user='" + getUser() + '\'' +
+        ", pass='" + getPass() + '\'' +
+        ", port=" + getPort() +
+        ", database='" + database + '\'' +
+        ", useSSL=" + useSSL +
+        '}';
+  }
 }
