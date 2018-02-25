@@ -43,9 +43,9 @@ public class ReporterServlet extends HttpServlet {
         ChartDataset cds = new ChartDataset("# of ads", data);
         cds.setBorderWidth(1);
         cds.generateRandomColorsForDataset();
-        ChartData cd = new ChartData(Arrays.asList("est", "cst", "mst", "pst"),
+        ChartData cd = new ChartData(Arrays.asList(result.getRows().get(0).getKeys()),
             Collections.singletonList(cds));
-        Chart chart = new Chart(ChartType.DOUGHNUT, cd);
+        Chart chart = new Chart(ChartType.PIE, cd);
         System.out.println("Built Chart");
         Gson gson = new Gson();
 

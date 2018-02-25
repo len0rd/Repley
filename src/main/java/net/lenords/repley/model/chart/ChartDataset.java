@@ -1,8 +1,8 @@
 package net.lenords.repley.model.chart;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ChartDataset {
   private String label;
@@ -18,11 +18,15 @@ public class ChartDataset {
 
   public void generateRandomColorsForDataset() {
     if (data != null && !data.isEmpty()) {
-      Iterator<Integer> iter = data.iterator();
+      final double GOLDEN_RATIO = 0.618033988749895f;
       backgroundColor = new ArrayList<>();
       borderColor = new ArrayList<>();
+      double hue = ThreadLocalRandom.current().nextDouble(1.0f);
+
       for (int i = 0; i < data.size(); i++ ){
-        ChartColor cc = new ChartColor(0.2f);
+        hue += GOLDEN_RATIO;
+
+        ChartColor cc = new ChartColor(hue % 1, 0.2f);
         backgroundColor.add(cc.toString());
         cc.setA(1f);
         borderColor.add(cc.toString());

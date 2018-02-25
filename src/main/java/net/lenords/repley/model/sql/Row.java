@@ -69,7 +69,6 @@ public class Row {
 
   public Integer[] getValues() {
     Integer[] values = new Integer[keyValues.size()];
-    System.out.println("get values");
     for (int i = 0; i < keyValues.size(); i++) {
       try {
         values[i] = (int) keyValues.get(i).getValue();
@@ -77,20 +76,17 @@ public class Row {
         cce.printStackTrace();
         values[i] = -1;
       }
-      System.out.println("got " + values[i]);
     }
     return values;
   }
 
-  public JSONArray valuesToArray() {
-    JSONArray out = new JSONArray();
-    //TODO: type checks here. values need to all be same type, right?
-    for (Tuple t : keyValues) {
-      out.put(t.getValue());
+  public String[] getKeys() {
+    String[] keys = new String[keyValues.size()];
+    for (int i = 0; i < keyValues.size(); i++) {
+      keys[i] = keyValues.get(i).getKey();
     }
-    return out;
+    return keys;
   }
-
 
 }
 
