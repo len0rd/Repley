@@ -29,33 +29,48 @@ public class ReporterServlet extends HttpServlet {
   protected void doGet(HttpServletRequest request,
       HttpServletResponse response) throws ServletException, IOException {
     String param = request.getParameter("q");
+    String type  = request.getParameter("t");
 
     if (param.equals("chart")) {
       ConnectionHelper builder = new ConnectionHelper();
       System.out.println("Connection setup");
       Accessor sqlAccessor = builder.getAccessor();
-      String query = "SELECT est, cst, mst, pst FROM re_stat.export_total WHERE type_id = 1 AND date > DATE_SUB(CURDATE(), INTERVAL 1 DAY)";
-      SqlResult result = sqlAccessor.getQueryResult(query);
-      System.out.println("Queried");
 
-      if (!result.isEmpty()) {
-        List<Integer> data = Arrays.asList(result.getRows().get(0).getValues());
-        ChartDataset cds = new ChartDataset("# of ads", data);
-        cds.setBorderWidth(1);
-        cds.generateRandomColorsForDataset();
-        ChartData cd = new ChartData(Arrays.asList(result.getRows().get(0).getKeys()),
-            Collections.singletonList(cds));
-        Chart chart = new Chart(ChartType.PIE, cd);
-        System.out.println("Built Chart");
-        Gson gson = new Gson();
+      if (type.equals("stage")) {
+        String query = "SELECT stage, COUNT(*) FROM re_fsbo_front.re_fsbo GROUP BY stage";
+        SqlResult result = sqlAccessor.getQueryResult(query);
+        System.out.println("Queried");
 
-        //JSONArray toReturn = result.getRows().get(0).valuesToArray();
-        System.out.println("Serialize!");
-        String jsonResult = gson.toJson(chart, Chart.class);
-        System.out.println(jsonResult);
-        response.setContentType("application/json");
-        response.getWriter().write(jsonResult);
+        if (!result.isEmpty()) {
+          ChartDataset cds = new ChartDataset("# of ads", result.getColumns().get(1).getValues());
+          cds.setBorderWidth(1);
+          cds.generateRandomColorsForDataset();
+          ChartData cData = new ChartData(result.getColumns().get(0).getValues(), Collections.singletonList(cds));
+          Chart chart = new Chart(ChartType.PIE, cData);
+          System.out.println("Built Chart");
+
+          sendChartResult(response, chart);
+        }
+
+      } else {
+        String query = "SELECT est, cst, mst, pst FROM re_stat.export_total WHERE type_id = 1 AND date > DATE_SUB(CURDATE(), INTERVAL 1 DAY)";
+        SqlResult result = sqlAccessor.getQueryResult(query);
+        System.out.println("Queried");
+
+        if (!result.isEmpty()) {
+          List<Integer> data = Arrays.asList(result.getRows().get(0).getValues());
+          ChartDataset cds = new ChartDataset("# of ads", data);
+          cds.setBorderWidth(1);
+          cds.generateRandomColorsForDataset();
+          ChartData cd = new ChartData(Arrays.asList(result.getRows().get(0).getKeys()),
+              Collections.singletonList(cds));
+          Chart chart = new Chart(ChartType.PIE, cd);
+          System.out.println("Built Chart");
+
+          sendChartResult(response, chart);
+        }
       }
+
       System.out.println("Done");
       sqlAccessor.close();
     }
@@ -76,6 +91,15 @@ public class ReporterServlet extends HttpServlet {
       response.getWriter().write(jsonResult);
     }*/
 
+  }
+
+  private void sendChartResult(HttpServletResponse response, Chart chart) throws IOException {
+    Gson gson = new Gson();
+    System.out.println("Serialize!");
+    String jsonResult = gson.toJson(chart, Chart.class);
+    System.out.println(jsonResult);
+    response.setContentType("application/json");
+    response.getWriter().write(jsonResult);
   }
 
 }
