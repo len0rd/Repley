@@ -38,10 +38,12 @@ public class ChartColor {
   }
 
   /**
-   * Based mostly on this:
+   * Based on this:
    * https://martin.ankerl.com/2009/12/09/how-to-create-random-colors-programmatically/
-   * Which is based on this wiki:
+   * Which is based on this:
    * https://en.wikipedia.org/wiki/HSL_and_HSV#Converting_to_RGB
+   * And this:
+   * http://en.wikipedia.org/wiki/Golden_ratio
    * @param hue         HSV hue value
    * @param saturation  HSV saturation value
    * @param value       HSV value value

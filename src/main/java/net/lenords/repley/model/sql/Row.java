@@ -16,14 +16,7 @@ public class Row {
     keyValues = new ArrayList<>();
   }
 
-  public Row populate(ResultSet rs, List<String> columnNames, List<Integer> sqlTypes) {
-    for (int i = 0; i < columnNames.size(); i++) {
-      keyValues.add(addTuple(rs, columnNames.get(i), sqlTypes.get(i)));
-    }
-    return this;
-  }
-
-  private Tuple addTuple(ResultSet rs, String columnName, int type) {
+  public Tuple createTuple(ResultSet rs, String columnName, int type) {
     try {
       switch (type) {
         case Types.INTEGER:
@@ -49,6 +42,10 @@ public class Row {
       se.printStackTrace();
     }
     return null;
+  }
+
+  public void addTuple(Tuple tuple) {
+    keyValues.add(tuple);
   }
 
   public List<Tuple> getTuples() {

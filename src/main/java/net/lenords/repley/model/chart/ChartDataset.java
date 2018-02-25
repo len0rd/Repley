@@ -23,9 +23,8 @@ public class ChartDataset {
       borderColor = new ArrayList<>();
       double hue = ThreadLocalRandom.current().nextDouble(1.0f);
 
-      for (int i = 0; i < data.size(); i++ ){
+      for (int i = 0; i < data.size(); i++ ) {
         hue += GOLDEN_RATIO;
-
         ChartColor cc = new ChartColor(hue % 1, 0.2f);
         backgroundColor.add(cc.toString());
         cc.setA(1f);
