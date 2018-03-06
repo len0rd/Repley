@@ -1,0 +1,22 @@
+{
+  "queryModels": [
+    {
+      "name": "getstage",
+      "params": {
+        "required": ["byo", "end"]
+      },
+      "query" : {
+        "sql": "SELECT stage, COUNT(*) FROM re_%byo_%end.re_fsbo GROUP BY stage"
+      }
+    },
+    {
+      "name": "tzexpoyesterday",
+      "params": {
+        "required": ["p1inttype"]
+      },
+      "query": {
+        "sql": "SELECT est, cst, mst, pst FROM re_stat.export_total WHERE type_id = ? AND date > DATE_SUB(CURDATE(), INTERVAL 1 DAY)"
+      }
+    }
+  ]
+}

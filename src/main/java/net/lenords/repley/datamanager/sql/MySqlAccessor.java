@@ -58,16 +58,16 @@ public class MySqlAccessor implements Accessor {
   }
 
   @Override
-  public SqlResult getQueryResult(String sqlQuery, List<String> orderedStringParams) {
+  public SqlResult getQueryResult(String sqlQuery, List<Object> orderedParams) {
     PreparedStatement ps = null;
     SqlResult result = null;
 
     try {
       ps = conn.prepareStatement(sqlQuery);
-      if (orderedStringParams != null && orderedStringParams.size() > 0) {
-        for (int i = 0; i < orderedStringParams.size(); i++) {
+      if (orderedParams != null && orderedParams.size() > 0) {
+        for (int i = 0; i < orderedParams.size(); i++) {
           //remember 1-based indexing
-          ps.setString(i + 1, orderedStringParams.get(i));
+          ps.setObject(i + 1, orderedParams.get(i));
         }
       }
       result = getQueryResult(ps);

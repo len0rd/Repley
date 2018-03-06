@@ -16,6 +16,7 @@ import net.lenords.repley.model.chart.Chart;
 import net.lenords.repley.model.chart.ChartData;
 import net.lenords.repley.model.chart.ChartDataset;
 import net.lenords.repley.model.chart.ChartType;
+import net.lenords.repley.model.queries.QueryModelContainer;
 import net.lenords.repley.model.sql.SqlResult;
 import org.json.JSONArray;
 
@@ -75,22 +76,13 @@ public class ReporterServlet extends HttpServlet {
       sqlAccessor.close();
     }
 
+  }
 
-    /*if (param.equals("test")) {
-      String data = "General Kenobi!" + param;
-      response.setContentType("text/plain");
-      response.setCharacterEncoding("UTF-8");
-      response.getWriter().write(data);
-    } else {
-      int[] dataPnts = {1, 3, 5, 4, 2, 6};
-      Gson gson = new Gson();
 
-      String jsonResult = gson.toJson(dataPnts);
-      System.out.println(jsonResult);
-      response.setContentType("application/json");
-      response.getWriter().write(jsonResult);
-    }*/
-
+  private void importQueries() {
+    Gson gson = new Gson();
+    System.out.println("Import Query info");
+    QueryModelContainer qmc = gson.fromJson()
   }
 
   private void sendChartResult(HttpServletResponse response, Chart chart) throws IOException {

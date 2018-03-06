@@ -29,8 +29,9 @@ public class SqlResult {
           columnTypes.add(rsmd.getColumnType(i));
         }
       }
-      rs.first();//go back so we get the first row's data
-      firstColRowInit(rs, columnNames, columnTypes);
+      if (rs.first()) { //go back so we get the first row's data
+        firstColRowInit(rs, columnNames, columnTypes);
+      }
       while (rs.next()) {
         populateNextRowCols(rs, columnNames, columnTypes);
       }

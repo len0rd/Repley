@@ -11,7 +11,7 @@ public interface Accessor {
 
   void close();
 
-  SqlResult getQueryResult(String sqlQuery, List<String> orderedStringParams);
+  SqlResult getQueryResult(String sqlQuery, List<Object> orderedParams);
 
   SqlResult getQueryResult(String sqlQuery);
 
