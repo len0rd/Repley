@@ -33,6 +33,20 @@ public class ChartDataset {
     }
   }
 
+  public void generateSingleColorForDataset() {
+    if (data != null && !data.isEmpty()) {
+      final double GOLDEN_RATIO = 0.618033988749895f;
+      backgroundColor = new ArrayList<>();
+      borderColor = new ArrayList<>();
+      double hue = ThreadLocalRandom.current().nextDouble(1.0f);
+
+      ChartColor cc = new ChartColor(hue % 1, 0.2f);
+      backgroundColor.add(cc.toString());
+      cc.setA(1f);
+      borderColor.add(cc.toString());
+    }
+  }
+
   public String getLabel() {
     return label;
   }
