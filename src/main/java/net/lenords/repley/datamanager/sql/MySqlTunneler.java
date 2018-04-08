@@ -26,9 +26,7 @@ public class MySqlTunneler extends MySqlAccessor {
       //get a random available port for our ssh/mysql tunnel
       //the ssh tunnel will forward all info to that port, so mysql can connect to it as
       //'localhost:PORT'
-      ServerSocket socket = null;
-      try {
-        socket = new ServerSocket(0);
+      try (ServerSocket socket = new ServerSocket(0)) {
         System.out.println("Tunneling mysql connection to: " + socket.getLocalPort());
         int availablePort = socket.getLocalPort();
         mysqlConn.setPort(availablePort);
@@ -36,10 +34,6 @@ public class MySqlTunneler extends MySqlAccessor {
         System.out.println(
             "===ERR::Failed to grab a random available port for ssh/mysql tunneling, proceeding with defaults...");
         e.printStackTrace();
-      } finally {
-        if (socket != null) {
-          socket.close();
-        }
       }
 
       JSch jsch = new JSch();

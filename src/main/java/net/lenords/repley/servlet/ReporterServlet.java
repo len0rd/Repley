@@ -36,6 +36,7 @@ public class ReporterServlet extends HttpServlet {
     String param = request.getParameter("q");
     String type  = request.getParameter("t");
     String byo   = request.getParameter("byo");
+    String days  = request.getParameter("days");
 
     if (param.equals("chart")) {
       String byoType = byo != null && byo.equalsIgnoreCase("frbo") ? "frbo" : "fsbo";
@@ -49,7 +50,6 @@ public class ReporterServlet extends HttpServlet {
       if (type.equals("stage")) {
         String query = "SELECT stage, COUNT(*) FROM re_" + byoType + "_front.re_fsbo GROUP BY stage";
         SqlResult result = sqlAccessor.getQueryResult(query);
-        System.out.println("Queried");
 
         if (!result.isEmpty()) {
           ChartDataset cds = new ChartDataset("# of ads", result.getColumns().get(1).getValues());
@@ -57,7 +57,6 @@ public class ReporterServlet extends HttpServlet {
           cds.generateRandomColorsForDataset();
           ChartData cData = new ChartData(result.getColumns().get(0).getValues(), Collections.singletonList(cds));
           Chart chart = new Chart(ChartType.PIE, cData);
-          System.out.println("Built Chart");
 
           sendChartResult(response, chart);
         }
@@ -98,7 +97,6 @@ public class ReporterServlet extends HttpServlet {
             + "FROM DUAL";
         query = query.replace("%byo", byoType);
         SqlResult result = sqlAccessor.getQueryResult(query);
-        System.out.println("Queried");
 
         if (!result.isEmpty()) {
           ChartDataset cds = new ChartDataset("# of Ads",
@@ -113,15 +111,23 @@ public class ReporterServlet extends HttpServlet {
 
       } else if (type.equals("expototal")) {
 
+        String dayLimit = "LIMIT 30";
+        if (days != null) {
+          if (days.equals("7")) {
+            dayLimit = "LIMIT 7";
+          } else if (days.equals("X")) {
+            dayLimit = "";
+          }
+        }
+
         String query = "SELECT DATE_FORMAT(expo.date, '%d %M %Y'), breakdown.complete "
             + "FROM re_stat.export_total AS expo "
             + "INNER JOIN re_stat.export_type ON expo.type_id = export_type.id "
             + "INNER JOIN re_stat.export_breakdown AS breakdown ON expo.breakdown_id = breakdown.id "
             + "WHERE expo.type_id = " + typeId
             + " ORDER BY date DESC "
-            + "LIMIT 30";
+            + dayLimit;
         SqlResult result = sqlAccessor.getQueryResult(query);
-        System.out.println("Queried");
 
         if (!result.isEmpty()) {
           ChartDataset cds = new ChartDataset("Ads exported", result.getColumns().get(1).getValues());
@@ -129,28 +135,10 @@ public class ReporterServlet extends HttpServlet {
           cds.generateSingleColorForDataset();
           ChartData chartData = new ChartData(result.getColumns().get(0).getValues(), Collections.singletonList(cds));
           Chart chart = new Chart(ChartType.LINE, chartData);
-          System.out.println("Built Chart");
 
           sendChartResult(response, chart);
         }
 
-      } else {
-        String query = "SELECT est, cst, mst, pst FROM re_stat.export_total WHERE type_id = 1 AND date > DATE_SUB(CURDATE(), INTERVAL 1 DAY)";
-        SqlResult result = sqlAccessor.getQueryResult(query);
-        System.out.println("Queried");
-
-        if (!result.isEmpty()) {
-          List<Integer> data = Arrays.asList(result.getRows().get(0).getValues());
-          ChartDataset cds = new ChartDataset("# of ads", data);
-          cds.setBorderWidth(1);
-          cds.generateRandomColorsForDataset();
-          ChartData cd = new ChartData(Arrays.asList(result.getRows().get(0).getKeys()),
-              Collections.singletonList(cds));
-          Chart chart = new Chart(ChartType.PIE, cd);
-          System.out.println("Built Chart");
-
-          sendChartResult(response, chart);
-        }
       }
 
       System.out.println("Done");
@@ -170,9 +158,8 @@ public class ReporterServlet extends HttpServlet {
     final GsonBuilder gsonBuilder = new GsonBuilder();
     gsonBuilder.registerTypeAdapter(ChartDataset.class, new ChartDatasetAdaptor());
     final Gson gson = gsonBuilder.create();
-    System.out.println("Serialize!");
+    //System.out.println("Serialize!");
     String jsonResult = gson.toJson(chart, Chart.class);
-    System.out.println('\n' + jsonResult + '\n');
     response.setContentType("application/json");
     response.getWriter().write(jsonResult);
   }
