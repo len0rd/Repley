@@ -1,2 +1,3 @@
 rootProject.name = 'reporter'
+include 'datalab_repley_ext'
 

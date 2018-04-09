@@ -1,19 +1,55 @@
 package net.lenords.repley.model.queries;
 
-import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
 public class QueryModel {
   private String name;
-  private QueryModelParams params;
-  private List<String> data_labels;
+  private QueryModelParamContainer params;
+  private Query query;
+  private QueryData data;
+
+  public QueryModel(String name, QueryModelParamContainer params,
+      Query query, QueryData data) {
+    this.name = name;
+    this.params = params;
+    this.query = query;
+    this.data = data;
+  }
 
   public QueryModel(String name) {
     this.name = name;
   }
 
-  public QueryModel(String name, QueryModelParams params) {
+  public QueryModel(String name, QueryModelParamContainer params) {
     this.name = name;
     this.params = params;
+  }
+
+  public String generateQueryFromParams(HttpServletRequest request) {
+    String query = this.query.getSql();
+    if (this.params != null) {
+      query = params.getAll().stream().filter(param -> request.getParameter(param) != null)
+          .reduce(query, (combinedQuery, param) -> combinedQuery
+              .replace("%" + param, request.getParameter(param)));
+    }
+
+    return query;
+  }
+
+  public Query getQuery() {
+    return query;
+  }
+
+  public void setQuery(Query query) {
+    this.query = query;
+  }
+
+  public QueryData getData() {
+    return data;
+  }
+
+  public void setData(QueryData data) {
+    this.data = data;
   }
 
   public String getName() {
@@ -24,28 +60,21 @@ public class QueryModel {
     this.name = name;
   }
 
-  public QueryModelParams getParams() {
+  public QueryModelParamContainer getParams() {
     return params;
   }
 
-  public void setParams(QueryModelParams params) {
+  public void setParams(QueryModelParamContainer params) {
     this.params = params;
-  }
-
-  public List<String> getData_labels() {
-    return data_labels;
-  }
-
-  public void setData_labels(List<String> data_labels) {
-    this.data_labels = data_labels;
   }
 
   @Override
   public String toString() {
     return "QueryModel{" +
         "name='" + name + '\'' +
-        ", params=" + params.toString() +
-        ", data_labels=" + data_labels.toString() +
+        ", params=" + params +
+        ", query=" + query +
+        ", data=" + data +
         '}';
   }
 }

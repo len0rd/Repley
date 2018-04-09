@@ -1,21 +1,21 @@
 {
   "queryModels": [
     {
-      "name": "getstage",
+      "name": "stage",
       "params": {
-        "required": ["byo", "end"]
+        "required": ["byo"]
       },
       "query" : {
-        "sql": "SELECT stage, COUNT(*) FROM re_%byo_%end.re_fsbo GROUP BY stage"
-      }
-    },
-    {
-      "name": "tzexpoyesterday",
-      "params": {
-        "required": ["p1inttype"]
+        "sql": "SELECT stage, COUNT(*) FROM re_%byo_front.re_fsbo GROUP BY stage"
       },
-      "query": {
-        "sql": "SELECT est, cst, mst, pst FROM re_stat.export_total WHERE type_id = ? AND date > DATE_SUB(CURDATE(), INTERVAL 1 DAY)"
+      "data": {
+        "title": "column.0",
+        "dataset": [
+          {
+            "name": "# of Ads",
+            "from": "column.1"
+          }
+        ]
       }
     }
   ]

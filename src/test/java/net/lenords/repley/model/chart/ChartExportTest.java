@@ -20,7 +20,7 @@ public class ChartExportTest {
     ChartData cd = new ChartData(Arrays.asList("one", "two", "three", "four", "five"),
         Collections.singletonList(cds));
     System.out.println("Created Data");
-    Chart chart = new Chart("pie", cd);
+    Chart chart = new Chart(ChartType.PIE, cd);
     System.out.println("Created Chart");
     Gson gson = new Gson();
 

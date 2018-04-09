@@ -14,6 +14,10 @@ public class QueryModelContainer {
     this.queryModels = queryModels;
   }
 
+  public QueryModel getQueryByName(String name) {
+    return queryModels.stream().filter(model -> model.getName().equals(name)).findFirst().orElse(null);
+  }
+
   public void addQueryModel(QueryModel queryModel) {
     this.queryModels.add(queryModel);
   }

@@ -2,6 +2,7 @@ package net.lenords.repley.servlet;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,6 +19,8 @@ import net.lenords.repley.model.chart.ChartData;
 import net.lenords.repley.model.chart.ChartDataset;
 import net.lenords.repley.model.chart.ChartDatasetAdaptor;
 import net.lenords.repley.model.chart.ChartType;
+import net.lenords.repley.model.queries.QueryDataset;
+import net.lenords.repley.model.queries.QueryModel;
 import net.lenords.repley.model.queries.QueryModelContainer;
 import net.lenords.repley.model.sql.SqlResult;
 import org.json.JSONArray;
@@ -45,10 +48,37 @@ public class ReporterServlet extends HttpServlet {
       ConnectionHelper builder = new ConnectionHelper();
       System.out.println("Connection setup");
       Accessor sqlAccessor = builder.getAccessor();
+      Gson gson = new Gson();
 
+
+      //NEWWWW:
+      QueryModelContainer container = gson.fromJson(new FileReader(
+              "/Users/tylermiller/code/Repley/conf/query_conf-sample-simple.json"),
+          QueryModelContainer.class);
 
       if (type.equals("stage")) {
-        String query = "SELECT stage, COUNT(*) FROM re_" + byoType + "_front.re_fsbo GROUP BY stage";
+
+        QueryModel model = container.getQueryByName(type);
+
+        SqlResult result = sqlAccessor.getQueryResult(model.generateQueryFromParams(request));
+
+        if (!result.isEmpty()) {
+          for (QueryDataset dataset : model.getData().getDataset()) {
+            ChartDataset cds = new ChartDataset(dataset.getName(), dataset.getFromResult(result));
+            cds.setBorderWidth(1);
+            cds.generateRandomColorsForDataset();
+          }
+
+          ChartDataset cds = new ChartDataset("# of ads", result.getColumns().get(1).getValues());
+          cds.setBorderWidth(1);
+          cds.generateRandomColorsForDataset();
+          ChartData cData = new ChartData(result.getColumns().get(0).getValues(), Collections.singletonList(cds));
+          Chart chart = new Chart(ChartType.PIE, cData);
+
+          sendChartResult(response, chart);
+        }
+
+        /*String query = "SELECT stage, COUNT(*) FROM re_" + byoType + "_front.re_fsbo GROUP BY stage";
         SqlResult result = sqlAccessor.getQueryResult(query);
 
         if (!result.isEmpty()) {
@@ -59,7 +89,7 @@ public class ReporterServlet extends HttpServlet {
           Chart chart = new Chart(ChartType.PIE, cData);
 
           sendChartResult(response, chart);
-        }
+        }*/
 
       } else if (type.equals("funnel")) {
 
@@ -145,13 +175,6 @@ public class ReporterServlet extends HttpServlet {
       sqlAccessor.close();
     }
 
-  }
-
-
-  private void importQueries() {
-    Gson gson = new Gson();
-    System.out.println("Import Query info");
-    //QueryModelContainer qmc = gson.fromJson();
   }
 
   private void sendChartResult(HttpServletResponse response, Chart chart) throws IOException {
