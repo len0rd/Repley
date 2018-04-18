@@ -2,6 +2,7 @@
   "queryModels": [
     {
       "name": "stage",
+      "type": "pie",
       "params": {
         "required": ["byo"]
       },
@@ -14,6 +15,25 @@
           {
             "name": "# of Ads",
             "from": "column.1"
+          }
+        ]
+      }
+    },
+    {
+      "name": "funnel",
+      "type": "line",
+      "params": {
+        "required": ["byo"]
+      },
+      "query": {
+        "sql": "SELECT (SELECT COUNT(*) FROM re_%byo_front.re_fsbo WHERE re_%byo_front.re_fsbo.latestExtractionDate > CURDATE()) AS frontendTotalCount, (SELECT COUNT(*) FROM re_%byo_front.re_fsbo WHERE re_%byo_front.re_fsbo.firstExtractionDate > CURDATE()) AS frontendUniqueCount, (SELECT COUNT(*) FROM re_%byo_front.re_fsbo WHERE re_%byo_front.re_fsbo.firstExtractionDate > CURDATE() AND (stage = '0' OR stage = '2' OR stage like '1%')) AS frontendProcessableCount, (SELECT COUNT(*) FROM re_%byo_back.re_fsbo WHERE re_%byo_back.re_fsbo.firstExtractionDate > CURDATE()) AS stagerCount, (SELECT COUNT(*) FROM re_%byo_back.re_fsbo_complete WHERE re_%byo_back.re_fsbo_complete.firstExtractionDate > CURDATE()) AS completeCount, (SELECT COUNT(*) FROM re_%byo_back.re_fsbo_complete WHERE re_%byo_back.re_fsbo_complete.firstExtractionDate > CURDATE() AND (Area_Name IS NULL OR Area_Name<>'Other')) AS validExport FROM DUAL"
+      },
+      "data": {
+        "title": "row.names",
+        "dataset": [
+          {
+            "name": "# of Ads",
+            "from": "row.0"
           }
         ]
       }

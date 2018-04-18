@@ -23,157 +23,192 @@ import net.lenords.repley.model.queries.QueryDataset;
 import net.lenords.repley.model.queries.QueryModel;
 import net.lenords.repley.model.queries.QueryModelContainer;
 import net.lenords.repley.model.sql.SqlResult;
-import org.json.JSONArray;
 
 @WebServlet("/repley/*")
 public class ReporterServlet extends HttpServlet {
 
 
-  private String type;
-
   protected void doPost(HttpServletRequest request,
       HttpServletResponse response) throws ServletException, IOException {}
 
+  //TODO:This is a steaming pile of trash::
   protected void doGet(HttpServletRequest request,
       HttpServletResponse response) throws ServletException, IOException {
     String param = request.getParameter("q");
     String type  = request.getParameter("t");
     String byo   = request.getParameter("byo");
     String days  = request.getParameter("days");
+    String value = request.getParameter("v");
+    String byoType = byo != null && byo.equalsIgnoreCase("frbo") ? "frbo" : "fsbo";
+
+    ConnectionHelper builder = new ConnectionHelper();
+    System.out.println("Connection setup");
+    Accessor sqlAccessor = builder.getAccessor();
+    int typeId = byoType.equals("frbo") ? 2 : 1;
 
     if (param.equals("chart")) {
-      String byoType = byo != null && byo.equalsIgnoreCase("frbo") ? "frbo" : "fsbo";
-      int typeId = byoType.equals("frbo") ? 2 : 1;
-
-      ConnectionHelper builder = new ConnectionHelper();
-      System.out.println("Connection setup");
-      Accessor sqlAccessor = builder.getAccessor();
       Gson gson = new Gson();
-
+      Chart chart = null;
 
       //NEWWWW:
       QueryModelContainer container = gson.fromJson(new FileReader(
               "/Users/tylermiller/code/Repley/conf/query_conf-sample-simple.json"),
           QueryModelContainer.class);
 
-      if (type.equals("stage")) {
-
-        QueryModel model = container.getQueryByName(type);
-
-        SqlResult result = sqlAccessor.getQueryResult(model.generateQueryFromParams(request));
-
-        if (!result.isEmpty()) {
-          for (QueryDataset dataset : model.getData().getDataset()) {
-            ChartDataset cds = new ChartDataset(dataset.getName(), dataset.getFromResult(result));
-            cds.setBorderWidth(1);
-            cds.generateRandomColorsForDataset();
-          }
-
-          ChartDataset cds = new ChartDataset("# of ads", result.getColumns().get(1).getValues());
-          cds.setBorderWidth(1);
-          cds.generateRandomColorsForDataset();
-          ChartData cData = new ChartData(result.getColumns().get(0).getValues(), Collections.singletonList(cds));
-          Chart chart = new Chart(ChartType.PIE, cData);
-
-          sendChartResult(response, chart);
+      String dayLimit = "LIMIT 30";
+      if (days != null) {
+        if (days.matches("\\d+")) {
+          dayLimit = "LIMIT " + days;
+        } else {
+          dayLimit = "";
         }
-
-        /*String query = "SELECT stage, COUNT(*) FROM re_" + byoType + "_front.re_fsbo GROUP BY stage";
-        SqlResult result = sqlAccessor.getQueryResult(query);
-
-        if (!result.isEmpty()) {
-          ChartDataset cds = new ChartDataset("# of ads", result.getColumns().get(1).getValues());
-          cds.setBorderWidth(1);
-          cds.generateRandomColorsForDataset();
-          ChartData cData = new ChartData(result.getColumns().get(0).getValues(), Collections.singletonList(cds));
-          Chart chart = new Chart(ChartType.PIE, cData);
-
-          sendChartResult(response, chart);
-        }*/
-
-      } else if (type.equals("funnel")) {
-
-        String query = "SELECT ( "
-            + "  SELECT COUNT(*)  "
-            + "  FROM re_%byo_front.re_fsbo "
-            + "  WHERE re_%byo_front.re_fsbo.latestExtractionDate > CURDATE() "
-            + ") AS frontendTotalCount, "
-            + "( "
-            + "  SELECT COUNT(*)  "
-            + "  FROM re_%byo_front.re_fsbo "
-            + "  WHERE re_%byo_front.re_fsbo.firstExtractionDate > CURDATE() "
-            + ") AS frontendUniqueCount, "
-            + "( "
-            + " SELECT COUNT(*)  "
-            + " FROM re_%byo_front.re_fsbo "
-            + " WHERE re_%byo_front.re_fsbo.firstExtractionDate > CURDATE() AND (stage = '0' OR stage = '2' OR stage like '1%') "
-            + ") AS frontendProcessableCount, "
-            + "( "
-            + " SELECT COUNT(*)  "
-            + " FROM re_%byo_back.re_fsbo "
-            + " WHERE re_%byo_back.re_fsbo.firstExtractionDate > CURDATE() "
-            + ") AS stagerCount, "
-            + "( "
-            + " SELECT COUNT(*)  "
-            + " FROM re_%byo_back.re_fsbo_complete "
-            + " WHERE re_%byo_back.re_fsbo_complete.firstExtractionDate > CURDATE() "
-            + ") AS completeCount, "
-            + "( "
-            + " SELECT COUNT(*)  "
-            + " FROM re_%byo_back.re_fsbo_complete "
-            + " WHERE re_%byo_back.re_fsbo_complete.firstExtractionDate > CURDATE() "
-            + "    AND (Area_Name IS NULL OR Area_Name<>'Other') "
-            + ") AS validExport "
-            + "FROM DUAL";
-        query = query.replace("%byo", byoType);
-        SqlResult result = sqlAccessor.getQueryResult(query);
-
-        if (!result.isEmpty()) {
-          ChartDataset cds = new ChartDataset("# of Ads",
-              Arrays.asList(result.getRows().get(0).getValues()));
-          cds.setBorderWidth(2);
-          cds.generateSingleColorForDataset();
-          ChartData chartData = new ChartData(Arrays.asList(result.getRows().get(0).getKeys()), Collections.singletonList(cds));
-          Chart chart = new Chart(ChartType.LINE, chartData);
-
-          sendChartResult(response, chart);
-        }
-
-      } else if (type.equals("expototal")) {
-
-        String dayLimit = "LIMIT 30";
-        if (days != null) {
-          if (days.equals("7")) {
-            dayLimit = "LIMIT 7";
-          } else if (days.equals("X")) {
-            dayLimit = "";
-          }
-        }
-
-        String query = "SELECT DATE_FORMAT(expo.date, '%d %M %Y'), breakdown.complete "
-            + "FROM re_stat.export_total AS expo "
-            + "INNER JOIN re_stat.export_type ON expo.type_id = export_type.id "
-            + "INNER JOIN re_stat.export_breakdown AS breakdown ON expo.breakdown_id = breakdown.id "
-            + "WHERE expo.type_id = " + typeId
-            + " ORDER BY date DESC "
-            + dayLimit;
-        SqlResult result = sqlAccessor.getQueryResult(query);
-
-        if (!result.isEmpty()) {
-          ChartDataset cds = new ChartDataset("Ads exported", result.getColumns().get(1).getValues());
-          cds.setBorderWidth(2);
-          cds.generateSingleColorForDataset();
-          ChartData chartData = new ChartData(result.getColumns().get(0).getValues(), Collections.singletonList(cds));
-          Chart chart = new Chart(ChartType.LINE, chartData);
-
-          sendChartResult(response, chart);
-        }
-
       }
 
-      System.out.println("Done");
-      sqlAccessor.close();
+      switch (type) {
+        case "funnel":
+        case "stage":
+
+          QueryModel model = container.getQueryByName(type);
+          SqlResult result = sqlAccessor.getQueryResult(model.generateQueryFromParams(request));
+          if (!result.isEmpty()) {
+            chart = model.generateChartFromResult(result);
+          }
+          break;
+        case "expototal":
+
+          String ttlQuery = "SELECT DATE_FORMAT(expo.date, '%d %M %Y'), breakdown.complete "
+              + "FROM re_stat.export_total AS expo "
+              + "INNER JOIN re_stat.export_type ON expo.type_id = export_type.id "
+              + "INNER JOIN re_stat.export_breakdown AS breakdown ON expo.breakdown_id = breakdown.id "
+              + "WHERE expo.type_id = " + typeId
+              + " ORDER BY date DESC "
+              + dayLimit;
+          SqlResult result2 = sqlAccessor.getQueryResult(ttlQuery);
+
+          if (!result2.isEmpty()) {
+            ChartDataset cds = new ChartDataset("Ads exported", result2.getColumns().get(1).getValues());
+            cds.setBorderWidth(2);
+            cds.generateSingleColorForDataset();
+            ChartData chartData = new ChartData(result2.getColumns().get(0).getValues(), Collections.singletonList(cds));
+            chart = new Chart(ChartType.LINE, chartData);
+
+          }
+          break;
+        case "areas":
+
+          String area = request.getParameter("a");
+          SqlResult result3 = null;
+          ChartType type1;
+
+
+          if ((area == null || area.isEmpty()) && value != null) {
+            type1 = ChartType.BAR;
+            System.out.println("generating a state overview");
+            String state = "IS NULL";
+            state = !value.isEmpty() && !value.equals("null") && value.length() < 3 ? "= '" + value + "'" : state;
+            String sumLimit = "totals.date > DATE_SUB(CURRENT_DATE, INTERVAL 30 DAY) AND";
+            if (days != null) {
+              if (days.matches("\\d+")) {
+                sumLimit = "totals.date > DATE_SUB(CURRENT_DATE, INTERVAL " + days + " DAY) AND";
+              } else if (days.equals("X")) {
+                sumLimit = "";
+              }
+            }
+
+            //then we're throwing down a overview of the state as a bar chart:
+            //this query is gettin a bit out of hand...
+            String stateAreaTotal = "SELECT areas.area_name, CAST(IFNULL(SUM(`names`.complete), 0) AS UNSIGNED), CAST(IFNULL(SUM(`names`.sent), 0) AS UNSIGNED) "
+                + "FROM re_stat.area_name_id AS areas "
+                + "INNER JOIN re_stat.export_area_name AS `names` ON `names`.area_name_id = areas.id "
+                + "INNER JOIN re_stat.export_total AS totals ON `names`.export_id = totals.id "
+                + "WHERE " + sumLimit
+                + " totals.type_id = " + typeId
+                + " AND areas.area_st " + state
+                + " GROUP BY areas.area_st, areas.area_name";
+
+            System.out.println("QUERY::\n" + stateAreaTotal);
+            result3 = sqlAccessor.getQueryResult(stateAreaTotal);
+
+          } else {
+            type1 = ChartType.LINE;
+            //generate a line chart of history export
+            String state = "IS NULL";
+            state = value != null && !value.isEmpty() && !value.equals("null") && value.length() < 3 ? "= '" + value + "'" : state;
+            String areaQuery = "IS NULL";
+            areaQuery = area != null && !area.isEmpty() && !area.equals("null") ? "= '" + area + "'" : areaQuery;
+
+            String areanameHist = "SELECT DATE_FORMAT(totals.date, '%d %M %Y'), CAST(IFNULL(`names`.complete, 0) AS UNSIGNED), CAST(IFNULL(`names`.sent, 0) AS UNSIGNED) "
+                + "FROM re_stat.area_name_id AS areas "
+                + "INNER JOIN re_stat.export_area_name AS `names` ON `names`.area_name_id = areas.id "
+                + "INNER JOIN re_stat.export_total AS totals ON `names`.export_id = totals.id "
+                + "WHERE totals.type_id = " + typeId
+                + " AND areas.area_st " + state
+                + " AND areas.area_name  " + areaQuery
+                + "ORDER BY totals.date DESC "
+                + dayLimit;
+
+            result3 = sqlAccessor.getQueryResult(areanameHist);
+
+          }
+
+          if (result3 != null && !result3.isEmpty()) {
+
+            ChartDataset expo = new ChartDataset("Ads exported", result3.getColumns().get(1).getValues());
+            expo.setBorderWidth(1);
+
+            ChartDataset sent = new ChartDataset("Ads sent", result3.getColumns().get(2).getValues());
+            sent.setBorderWidth(1);
+
+            ChartData data = new ChartData(result3.getColumns().get(0).getValues(), Arrays.asList(expo, sent));
+            data.generateRandomColorsForData();
+            chart = new Chart(type1, data);
+
+          }
+          break;
+      }
+
+      if (chart != null) {
+        sendChartResult(response, chart);
+      }
+
+
+    } else if (param.equals("list")) {
+
+      switch (type) {
+        case "states":
+          String getStates = "SELECT areas.area_st "
+              + "FROM re_stat.area_name_id AS areas "
+              + "INNER JOIN re_stat.export_area_name AS `names` ON `names`.area_name_id = areas.id "
+              + "INNER JOIN re_stat.export_total AS totals ON `names`.export_id = totals.id "
+              + "WHERE totals.type_id = " + typeId
+              + " GROUP BY areas.area_st";
+          SqlResult result = sqlAccessor.getQueryResult(getStates);
+          if (!result.isEmpty()) {
+            List states = result.getColumns().get(0).getValues();
+            sendList(response, states);
+          }
+          break;
+        case "areas":
+          String state = "IS NULL";
+          state = value != null && !value.equals("null") && value.length() < 3 ? "= '" + value + "'" : state;
+          String getAreas = "SELECT areas.area_name "
+              + "FROM re_stat.area_name_id AS areas "
+              + "INNER JOIN re_stat.export_area_name AS `names` ON `names`.area_name_id = areas.id "
+              + "INNER JOIN re_stat.export_total AS totals ON `names`.export_id = totals.id "
+              + "WHERE totals.type_id = " + typeId + " and areas.area_st " + state + " "
+              + "GROUP BY areas.area_name";
+          SqlResult areaResult = sqlAccessor.getQueryResult(getAreas);
+          if (!areaResult.isEmpty()) {
+            List areas = areaResult.getColumns().get(0).getValues();
+            sendList(response, areas);
+          }
+          break;
+      }
+
     }
+
+    System.out.println("Done");
+    sqlAccessor.close();
 
   }
 
@@ -181,10 +216,21 @@ public class ReporterServlet extends HttpServlet {
     final GsonBuilder gsonBuilder = new GsonBuilder();
     gsonBuilder.registerTypeAdapter(ChartDataset.class, new ChartDatasetAdaptor());
     final Gson gson = gsonBuilder.create();
-    //System.out.println("Serialize!");
+    System.out.println("Serialize!");
     String jsonResult = gson.toJson(chart, Chart.class);
+    System.out.println(jsonResult);
     response.setContentType("application/json");
     response.getWriter().write(jsonResult);
+
+
+  }
+
+  private void sendList(HttpServletResponse response, List values) throws IOException{
+    final Gson gson = new Gson();
+    String json = gson.toJson(values);
+    System.out.println(values);
+    response.setContentType("application/json");
+    response.getWriter().write(json);
   }
 
 }

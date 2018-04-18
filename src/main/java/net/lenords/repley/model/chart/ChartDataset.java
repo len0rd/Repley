@@ -86,4 +86,12 @@ public class ChartDataset {
   public void setBackgroundColor(List<String> backgroundColor) {
     this.backgroundColor = backgroundColor;
   }
+
+  @Override
+  public String toString() {
+    StringBuilder out = new StringBuilder("ChartDataset{ label=").append(label).append(", \n data=");
+    data.forEach(val -> out.append(val).append(", "));
+    out.append("}");
+    return out.toString();
+  }
 }

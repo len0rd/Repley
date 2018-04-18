@@ -1,16 +1,20 @@
 package net.lenords.repley.model.queries;
 
 import javax.servlet.http.HttpServletRequest;
+import net.lenords.repley.model.chart.Chart;
+import net.lenords.repley.model.chart.ChartType;
+import net.lenords.repley.model.sql.SqlResult;
 
 public class QueryModel {
-  private String name;
+  private String name, type;
   private QueryModelParamContainer params;
   private Query query;
   private QueryData data;
 
-  public QueryModel(String name, QueryModelParamContainer params,
+  public QueryModel(String name, String type, QueryModelParamContainer params,
       Query query, QueryData data) {
     this.name = name;
+    this.type = type;
     this.params = params;
     this.query = query;
     this.data = data;
@@ -34,6 +38,19 @@ public class QueryModel {
     }
 
     return query;
+  }
+
+  public Chart generateChartFromResult(SqlResult result) {
+    ChartType ctype = ChartType.getTypeFromStr(type);
+    return new Chart(ctype, data.generateChartDataFromResult(result, ctype));
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
   }
 
   public Query getQuery() {
