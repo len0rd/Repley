@@ -1,0 +1,50 @@
+#!/bin/bash
+
+REPO_DIR="$(git rev-parse --show-toplevel)"
+EXTENSIONS="\.\(java\)$"
+
+
+echo "Running pre-commit formatter"
+echo "----------------------------"
+STAGED_FILES="$(git diff --cached --name-only --diff-filter=ACMR | grep $EXTENSIONS)"
+
+for file in $STAGED_FILES; do
+	echo "Formatting $file"
+	java -jar $REPO_DIR/ext_lib/google-java-format-1.5-all-deps.jar -i "$file"
+
+	# now that it's formatted, re add it to staged changes:
+	git add $file
+done;
+
+#################################################################################
+# originally the idea here was to format only the staged versions of files
+# so that unstaged changes would not automatically be added as a result of
+# formatting. unfortunately, at present this code causes issues of the git
+# index being different from local files. this makes it confusing (at least
+# to me), because it gives the impression that you didnt commit anything
+# that was formatted incorrectly, as the file will move to unstaged upon
+# commit, even though changes were committed. For now we'll just do the
+# simpler format, git add. But it would be nice to figure this out sometime
+################################################################################
+# replace="_tmp"
+# match=".java"
+# for file in $STAGED_FILES; do
+# 	#add "_tmp" to the end of the file before the .java extension:
+# 	tmpfilename=${file%%"${match}"*}${waddup}${file#*"${file%%"${match}"*}"}
+
+# 	echo "Formatting $file"
+# 	# store added file in a temporary
+# 	# this prevents us screwing with unstaged changes to the files
+# 	# on commit
+# 	git show ":$file" > "$tmpfilename"
+# 	java -jar $REPO_DIR/ext_lib/google-java-format-1.5-all-deps.jar "$tmpfilename" >> "$file.tmp"
+
+# 	# now that it's formatted, re add it to staged changes:
+# 	hash="$(git hash-object -w $file.tmp)"
+# 	git update-index --add --cacheinfo 100644 "$hash" "$file"
+
+# 	rm "$tmpfilename"
+# 	rm "$file.tmp"
+# done;
+
+echo "----------------------------"
