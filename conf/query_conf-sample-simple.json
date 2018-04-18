@@ -96,6 +96,148 @@
           }
         ]
       }
+    },
+
+    {
+      "name": "areast",
+      "type": "bar",
+      "params": {
+        "required": [
+          {
+            "name": "byo",
+            "mappings": [
+              {
+                "input": "frbo",
+                "mapto": "2"
+              },
+              {
+                "input": ".*?",
+                "mapto": "1"
+              }
+            ]
+          },
+          {
+            "name": "v",
+            "mappings": [
+              {
+                "input": "[A-z]{2}",
+                "mapto": "= '~@input@~'"
+              }
+            ],
+            "defaultValue": "IS NULL"
+          }
+        ],
+        "optional": [
+          {
+            "name": "days",
+            "mappings": [
+              {
+                "input": "\\d+",
+                "mapto": "totals.date > DATE_SUB(CURRENT_DATE, INTERVAL ~@input@~ DAY) AND"
+              },
+              {
+                "input": "X",
+                "mapto": ""
+              }
+            ],
+            "defaultValue": "totals.date > DATE_SUB(CURRENT_DATE, INTERVAL 30 DAY) AND"
+          }
+        ]
+      },
+      "query": {
+        "sql": "SELECT areas.area_name, CAST(IFNULL(SUM(`names`.complete), 0) AS UNSIGNED), CAST(IFNULL(SUM(`names`.sent), 0) AS UNSIGNED) FROM re_stat.area_name_id AS areas INNER JOIN re_stat.export_area_name AS `names` ON `names`.area_name_id = areas.id INNER JOIN re_stat.export_total AS totals ON `names`.export_id = totals.id WHERE ~@days@~ totals.type_id = ~@byo@~ AND areas.area_st ~@v@~ GROUP BY areas.area_st, areas.area_name"
+      },
+      "data": {
+        "title": "column.0",
+        "dataset": [
+          {
+            "name": "Ads exported",
+            "from": "column.1"
+          },
+          {
+            "name": "Ads Sent",
+            "from": "column.2"
+          }
+        ]
+      }
+    },
+
+    {
+      "name": "areahist",
+      "type": "line",
+      "params": {
+        "required": [
+          {
+            "name": "byo",
+            "mappings": [
+              {
+                "input": "frbo",
+                "mapto": "2"
+              },
+              {
+                "input": ".*?",
+                "mapto": "1"
+              }
+            ]
+          },
+          {
+            "name": "v",
+            "mappings": [
+              {
+                "input": "[A-z]{2}",
+                "mapto": "= '~@input@~'"
+              }
+            ],
+            "defaultValue": "IS NULL"
+          },
+          {
+            "name": "a",
+            "mappings": [
+              {
+                "input": "null",
+                "mapto": "IS NULL"
+              },
+              {
+                "input": "[A-z ]+",
+                "mapto": "= '~@input@~'"
+              }
+            ],
+            "defaultValue": "IS NULL"
+          }
+        ],
+        "optional": [
+          {
+            "name": "days",
+            "mappings": [
+              {
+                "input": "\\d+",
+                "mapto": "LIMIT ~@input@~"
+              },
+              {
+                "input": "X",
+                "mapto": ""
+              }
+            ],
+            "defaultValue": "LIMIT 30"
+          }
+        ]
+      },
+      "query": {
+        "sql": "SELECT DATE_FORMAT(totals.date, '%d %M %Y'), CAST(IFNULL(`names`.complete, 0) AS UNSIGNED), CAST(IFNULL(`names`.sent, 0) AS UNSIGNED) FROM re_stat.area_name_id AS areas INNER JOIN re_stat.export_area_name AS `names` ON `names`.area_name_id = areas.id INNER JOIN re_stat.export_total AS totals ON `names`.export_id = totals.id WHERE totals.type_id = ~@byo@~ AND areas.area_st ~@v@~ AND areas.area_name ~@a@~ ORDER BY totals.date DESC ~@days@~"
+      },
+      "data": {
+        "title": "column.0",
+        "dataset": [
+          {
+            "name": "Ads exported",
+            "from": "column.1"
+          },
+          {
+            "name": "Ads Sent",
+            "from": "column.2"
+          }
+        ]
+      }
     }
 
   ]

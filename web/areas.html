@@ -111,7 +111,7 @@
       title.innerHTML = selectedState + " Export History";
 
       getServletData('list', 'areas', 'fsbo', selectedState, 'query_area_list', loadList);
-      getServletData('chart', 'areas', 'fsbo', selectedState, 'area_info_chart', loadChart);
+      getServletData('chart', 'areast', 'fsbo', selectedState, 'area_info_chart', loadChart);
 
     }
 
@@ -124,7 +124,7 @@
       var title = document.getElementById("chart_title");
       title.innerHTML = selectedState + " - " + selectedArea + " Export History";
 
-      getServletData('chart', 'areas', 'fsbo', selectedState + "&a=" + selectedArea, 'area_info_chart', loadChart)
+      getServletData('chart', 'areahist', 'fsbo', selectedState + "&a=" + selectedArea, 'area_info_chart', loadChart)
     }
 
     function updateDayRange() {
@@ -132,11 +132,13 @@
       var selectedArea = document.getElementById("query_area_list").value;
       var selectedDate = document.getElementById("area_date_range").value;
 
+      var query = 'areast';
       var valueStr = selectedState + "&days=" + selectedDate;
-      //if (selectedArea != null) {
+      if (selectedArea != null && selectedArea !== '') {
+        query = 'areahist';
         valueStr += "&a=" + selectedArea;
-      //}
-      getServletData('chart', 'areas', 'fsbo', valueStr, 'area_info_chart', loadChart);
+      }
+      getServletData('chart', query, 'fsbo', valueStr, 'area_info_chart', loadChart);
     }
 
     getServletData('list', 'states', 'fsbo', '', 'query_state_list', loadList);

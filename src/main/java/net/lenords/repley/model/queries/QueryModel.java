@@ -54,6 +54,8 @@ public class QueryModel {
         }
       }
     }
+
+    System.out.println("Generated Query::" + query);
     return query;
   }
 
