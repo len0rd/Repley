@@ -11,8 +11,8 @@ public class QueryModel {
   private Query query;
   private QueryData data;
 
-  public QueryModel(String name, String type, QueryModelParamContainer params,
-      Query query, QueryData data) {
+  public QueryModel(
+      String name, String type, QueryModelParamContainer params, Query query, QueryData data) {
     this.name = name;
     this.type = type;
     this.params = params;
@@ -32,11 +32,28 @@ public class QueryModel {
   public String generateQueryFromParams(HttpServletRequest request) {
     String query = this.query.getSql();
     if (this.params != null) {
-      query = params.getAll().stream().filter(param -> request.getParameter(param) != null)
-          .reduce(query, (combinedQuery, param) -> combinedQuery
-              .replace("%" + param, request.getParameter(param)));
-    }
+      for (QueryModelParam param : params.getRequired()) {
+        String paramName = param.getName();
+        if (request.getParameter(paramName) != null) {
+          query =
+              query.replace(
+                  "~@" + paramName + "@~", param.mapToValue(request.getParameter(paramName)));
+        }
+      }
 
+      if (params.getOptional() != null) {
+        for (QueryModelParam param : params.getOptional()) {
+          String paramName = param.getName();
+          if (request.getParameter(paramName) != null) {
+            query =
+                query.replace(
+                    "~@" + paramName + "@~", param.mapToValue(request.getParameter(paramName)));
+          } else {
+            query = query.replace("~@" + paramName + "@~", param.getDefaultValue());
+          }
+        }
+      }
+    }
     return query;
   }
 
@@ -87,11 +104,16 @@ public class QueryModel {
 
   @Override
   public String toString() {
-    return "QueryModel{" +
-        "name='" + name + '\'' +
-        ", params=" + params +
-        ", query=" + query +
-        ", data=" + data +
-        '}';
+    return "QueryModel{"
+        + "name='"
+        + name
+        + '\''
+        + ", params="
+        + params
+        + ", query="
+        + query
+        + ", data="
+        + data
+        + '}';
   }
 }
