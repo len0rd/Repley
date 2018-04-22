@@ -198,7 +198,7 @@
                 "mapto": "IS NULL"
               },
               {
-                "input": "[A-z ]+",
+                "input": ".+",
                 "mapto": "= '~@input@~'"
               }
             ],

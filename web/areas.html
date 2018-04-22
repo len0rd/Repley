@@ -60,6 +60,7 @@
   <script src="https://code.getmdl.io/1.3.0/material.min.js"></script>
   <script>
     var currentChart;
+    var byoType;
 
     function getServletData(qID, type, byo, value, elementName, callbackFunction) {
       $.ajax({
@@ -110,26 +111,27 @@
       var title = document.getElementById("chart_title");
       title.innerHTML = selectedState + " Export History";
 
-      getServletData('list', 'areas', 'fsbo', selectedState, 'query_area_list', loadList);
-      getServletData('chart', 'areast', 'fsbo', selectedState, 'area_info_chart', loadChart);
+      getServletData('list', 'areas', byoType, selectedState, 'query_area_list', loadList);
+      getServletData('chart', 'areast', byoType, selectedState, 'area_info_chart', loadChart);
 
     }
 
     function selectArea() {
       var selectedState = document.getElementById("query_state_list").value;
       var selectedArea = document.getElementById("query_area_list").value;
+      var encodedArea = encodeURIComponent(selectedArea);
       //reset date dropdown to the first element
       document.getElementById("area_date_range").selectedIndex = 0;
 
       var title = document.getElementById("chart_title");
       title.innerHTML = selectedState + " - " + selectedArea + " Export History";
 
-      getServletData('chart', 'areahist', 'fsbo', selectedState + "&a=" + selectedArea, 'area_info_chart', loadChart)
+      getServletData('chart', 'areahist', byoType, selectedState + "&a=" + encodedArea, 'area_info_chart', loadChart)
     }
 
     function updateDayRange() {
       var selectedState = document.getElementById("query_state_list").value;
-      var selectedArea = document.getElementById("query_area_list").value;
+      var selectedArea = encodeURIComponent(document.getElementById("query_area_list").value);
       var selectedDate = document.getElementById("area_date_range").value;
 
       var query = 'areast';
@@ -138,11 +140,14 @@
         query = 'areahist';
         valueStr += "&a=" + selectedArea;
       }
-      getServletData('chart', query, 'fsbo', valueStr, 'area_info_chart', loadChart);
+      getServletData('chart', query, byoType, valueStr, 'area_info_chart', loadChart);
     }
 
-    getServletData('list', 'states', 'fsbo', '', 'query_state_list', loadList);
-
+    function selectByo() {
+      byoType = document.getElementById("query_byo_list").value;
+      getServletData('list', 'states', byoType, '', 'query_state_list', loadList);
+    }
+    
 
   </script>
 
@@ -188,50 +193,60 @@
 
           <div class="mdl-card__supporting-text">
             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-              <select class="mdl-textfield__input" id="query_state_list" onChange="selectState()">
+              <select class="mdl-textfield__input" id="query_byo_list" onChange="selectByo()">
                 <option></option>
+                <option value="fsbo">fsbo</option>
+                <option value="frbo">frbo</option>
               </select>
-              <label class="mdl-textfield__label" for="query_state_list">Area State</label>
+              <label class="mdl-textfield__label" for="query_state_list">ByOwner Type</label>
             </div>
 
-            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-              <select class="mdl-textfield__input" id="query_area_list" onChange="selectArea()">
-                <option></option>
-              </select>
-              <label class="mdl-textfield__label" for="query_area_list">Area Name</label>
+            <div class="mdl-card__supporting-text">
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <select class="mdl-textfield__input" id="query_state_list" onChange="selectState()">
+                  <option></option>
+                </select>
+                <label class="mdl-textfield__label" for="query_state_list">Area State</label>
+              </div>
+
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <select class="mdl-textfield__input" id="query_area_list" onChange="selectArea()">
+                  <option></option>
+                </select>
+                <label class="mdl-textfield__label" for="query_area_list">Area Name</label>
+              </div>
+            </div>
+
+            <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+              <i>Note: sent counts are updated 24hrs behind export counts. Therefore it is normal for today's sent count to equal 0</i>
             </div>
           </div>
 
-          <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-            <i>Note: sent counts are updated 24hrs behind export counts. Therefore it is normal for today's sent count to equal 0</i>
-          </div>
+
         </div>
 
+        <div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">
+          <div id="chart_line02_div" class="demo-chart mdl-cell mdl-cell--6-col mdl-cell--12-col-desktop">
+            <div class="mdl-card__title">
+              <h2 class="mdl-card__title-text" id="chart_title">Select at State and/or Area Name</h2>
+            </div>
 
-      </div>
+            <canvas id="area_info_chart"></canvas>
 
-      <div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">
-        <div id="chart_line02_div" class="demo-chart mdl-cell mdl-cell--6-col mdl-cell--12-col-desktop">
-          <div class="mdl-card__title">
-            <h2 class="mdl-card__title-text" id="chart_title">Select at State and/or Area Name</h2>
-          </div>
-
-          <canvas id="area_info_chart"></canvas>
-
-          <div class="mdl-card__supporting-text">
-            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-              <select class="mdl-textfield__input" id="area_date_range" onchange="updateDayRange()">
-                <option></option>
-                <option value="7">Week</option>
-                <option value="30">Month</option>
-                <option value="X">All Time</option>
-              </select>
-              <label class="mdl-textfield__label" for="area_date_range">Date Range</label>
+            <div class="mdl-card__supporting-text">
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <select class="mdl-textfield__input" id="area_date_range" onchange="updateDayRange()">
+                  <option></option>
+                  <option value="7">Week</option>
+                  <option value="30">Month</option>
+                  <option value="X">All Time</option>
+                </select>
+                <label class="mdl-textfield__label" for="area_date_range">Date Range</label>
+              </div>
             </div>
           </div>
         </div>
       </div>
-
     </div>
   </main>
 </div>

@@ -28,6 +28,7 @@ public class ReporterServlet extends HttpServlet {
   // TODO:This is a steaming pile of trash::
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
+    System.out.println("incoming query string:: " + request.getQueryString());
     String param = request.getParameter("q");
     String type = request.getParameter("t");
     String byo = request.getParameter("byo");
