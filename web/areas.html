@@ -147,7 +147,7 @@
       byoType = document.getElementById("query_byo_list").value;
       getServletData('list', 'states', byoType, '', 'query_state_list', loadList);
     }
-    
+
 
   </script>
 
@@ -191,17 +191,16 @@
             <h2 class="mdl-card__title-text">Select Area Name</h2>
           </div>
 
-          <div class="mdl-card__supporting-text">
-            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-              <select class="mdl-textfield__input" id="query_byo_list" onChange="selectByo()">
-                <option></option>
-                <option value="fsbo">fsbo</option>
-                <option value="frbo">frbo</option>
-              </select>
-              <label class="mdl-textfield__label" for="query_state_list">ByOwner Type</label>
-            </div>
-
             <div class="mdl-card__supporting-text">
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <select class="mdl-textfield__input" id="query_byo_list" onChange="selectByo()">
+                  <option></option>
+                  <option value="fsbo">fsbo</option>
+                  <option value="frbo">frbo</option>
+                </select>
+                <label class="mdl-textfield__label" for="query_state_list">ByOwner Type</label>
+              </div>
+
               <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                 <select class="mdl-textfield__input" id="query_state_list" onChange="selectState()">
                   <option></option>
