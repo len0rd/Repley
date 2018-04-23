@@ -1,6 +1,9 @@
 package net.lenords.repley.model.queries;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import net.lenords.repley.datamanager.sql.Accessor;
 import net.lenords.repley.model.chart.Chart;
 import net.lenords.repley.model.chart.ChartType;
 import net.lenords.repley.model.sql.SqlResult;
@@ -29,15 +32,21 @@ public class QueryModel {
     this.params = params;
   }
 
-  public String generateQueryFromParams(HttpServletRequest request) {
+  public SqlResult executeQueryFromParams(Accessor accessor, HttpServletRequest request) {
+    List<Object> psVariables = new ArrayList<>();
+
     String query = this.query.getSql();
     if (this.params != null) {
       for (QueryModelParam param : params.getRequired()) {
         String paramName = param.getName();
         if (request.getParameter(paramName) != null) {
-          query =
-              query.replace(
-                  "~@" + paramName + "@~", param.mapToValue(request.getParameter(paramName)));
+          MappedValue mval = param.mapToValue(request.getParameter(paramName));
+          if (mval.usePS()) {
+            query = query.replace("~@" + paramName + "@~", mval.getPrototypeValue());
+            psVariables.add(mval.getValue());
+          } else {
+            query = query.replace("~@" + paramName + "@~", mval.getValue());
+          }
         }
       }
 
@@ -45,9 +54,13 @@ public class QueryModel {
         for (QueryModelParam param : params.getOptional()) {
           String paramName = param.getName();
           if (request.getParameter(paramName) != null) {
-            query =
-                query.replace(
-                    "~@" + paramName + "@~", param.mapToValue(request.getParameter(paramName)));
+            MappedValue mval = param.mapToValue(request.getParameter(paramName));
+            if (mval.usePS()) {
+              query = query.replace("~@" + paramName + "@~", mval.getPrototypeValue());
+              psVariables.add(mval.getValue());
+            } else {
+              query = query.replace("~@" + paramName + "@~", mval.getValue());
+            }
           } else {
             query = query.replace("~@" + paramName + "@~", param.getDefaultValue());
           }
@@ -56,7 +69,7 @@ public class QueryModel {
     }
 
     System.out.println("Generated Query::" + query);
-    return query;
+    return accessor.getQueryResult(query, psVariables);
   }
 
   public Chart generateChartFromResult(SqlResult result) {

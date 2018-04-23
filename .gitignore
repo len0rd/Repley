@@ -3,6 +3,7 @@
 /out/
 /.gradle/
 /conf/ssh_connection.json
+/conf/byo-query.json
 /conf/mysql_connection.json
 /build/
 /web/node_modules/

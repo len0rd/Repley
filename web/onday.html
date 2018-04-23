@@ -59,87 +59,6 @@
   <script src="http://code.jquery.com/jquery-latest.min.js"></script>
   <script src="https://code.getmdl.io/1.3.0/material.min.js"></script>
   <script>
-    var currentChart;
-
-    function getServletData(qID, type, byo, value, elementName, callbackFunction) {
-      $.ajax({
-        url: 'repley',
-        type: 'GET',
-        data: "q=" + qID + "&t=" + type + "&byo=" + byo + "&v=" + value,
-        success : callbackFunction(elementName)
-      });
-    }
-
-    var loadList = function(elementName) {
-      return function(data, testStatus, jqXHR) {
-        var opts = document.getElementById(elementName);
-        //clear out current list:
-
-        for (i = opts.options.length-1; i >= 1; i--) {
-          opts.options[i] = null;
-        }
-
-        for (var i in data) {
-          var opt = document.createElement("option");
-          opt.value = data[i];
-          opt.innerHTML = data[i];
-
-          opts.appendChild(opt);
-        }
-      }
-    };
-
-    var loadChart = function(elementName) {
-      return function(data, testStatus, jqXHR) {
-        var canvas = document.getElementById(elementName);
-        var ctx = canvas.getContext('2d');
-        //clear out any old crap
-        if (currentChart != null) {
-          currentChart.destroy();
-        }
-        //ctx.beginPath();
-        //ctx.clearRect(0, 0, canvas.width, canvas.height);
-        currentChart = new Chart(ctx, data);
-      }
-    };
-
-    function selectState() {
-      var selectedState = document.getElementById("query_state_list").value;
-      //reset date dropdown to the first element
-      document.getElementById("area_date_range").selectedIndex = 0;
-      var title = document.getElementById("chart_title");
-      title.innerHTML = selectedState + " Export History";
-
-      getServletData('list', 'areas', 'fsbo', selectedState, 'query_area_list', loadList);
-      getServletData('chart', 'areas', 'fsbo', selectedState, 'area_info_chart', loadChart);
-
-    }
-
-    function selectArea() {
-      var selectedState = document.getElementById("query_state_list").value;
-      var selectedArea = document.getElementById("query_area_list").value;
-      //reset date dropdown to the first element
-      document.getElementById("area_date_range").selectedIndex = 0;
-
-      var title = document.getElementById("chart_title");
-      title.innerHTML = selectedState + " - " + selectedArea + " Export History";
-
-      getServletData('chart', 'areas', 'fsbo', selectedState + "&a=" + selectedArea, 'area_info_chart', loadChart)
-    }
-
-    function updateDayRange() {
-      var selectedState = document.getElementById("query_state_list").value;
-      var selectedArea = document.getElementById("query_area_list").value;
-      var selectedDate = document.getElementById("area_date_range").value;
-
-      var valueStr = selectedState + "&days=" + selectedDate;
-      //if (selectedArea != null) {
-      valueStr += "&a=" + selectedArea;
-      //}
-      getServletData('chart', 'areas', 'fsbo', valueStr, 'area_info_chart', loadChart);
-    }
-
-    getServletData('list', 'states', 'fsbo', '', 'query_state_list', loadList);
 
 
   </script>
@@ -183,23 +102,32 @@
           </div>
 
           <div class="mdl-card__supporting-text">
+
             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-              <select class="mdl-textfield__input" id="query_state_list" onChange="selectState()">
+              <select class="mdl-textfield__input" id="query_date_year_list" onChange="selectYear()">
                 <option></option>
               </select>
-              <label class="mdl-textfield__label" for="query_state_list">Area State</label>
+              <label class="mdl-textfield__label" for="query_date_year_list">Year</label>
             </div>
 
             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-              <select class="mdl-textfield__input" id="query_area_list" onChange="selectArea()">
+              <select class="mdl-textfield__input" id="query_date_month_list" onChange="selectMonth()">
                 <option></option>
               </select>
-              <label class="mdl-textfield__label" for="query_area_list">Area Name</label>
+              <label class="mdl-textfield__label" for="query_date_month_list">Month</label>
             </div>
+
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+              <select class="mdl-textfield__input" id="query_date_day_list" onChange="selectDay()">
+                <option></option>
+              </select>
+              <label class="mdl-textfield__label" for="query_date_day_list">Day</label>
+            </div>
+
           </div>
 
           <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-            <i>Note: sent counts are updated 24hrs behind export counts. Therefore it is normal for today's sent count to equal 0</i>
+            <i>Note: sent counts are updated 24hrs behind export counts. Therefore it is normal for today's sent count to equal 0.</i>
           </div>
         </div>
 

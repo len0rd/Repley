@@ -32,21 +32,27 @@ public class QueryModelParam {
     this.defaultValue = null;
   }
 
-  public String mapToValue(String inputValue) {
+  public MappedValue mapToValue(String inputValue) {
     String ogInput = inputValue;
     if (hasMapping()) {
       for (Mapping mapping : mappings) {
         if (inputValue.matches(mapping.getInput())) {
           inputValue = mapping.getMapto();
-          if (inputValue.contains("~@input@~")) {
-            inputValue = inputValue.replace("~@input@~", ogInput);
+          inputValue = inputValue.replace("~@input@~", ogInput);
+          MappedValue mval = new MappedValue(inputValue);
+          if (inputValue.contains("~@ps_input@~")) {
+            inputValue = inputValue.replace("~@ps_input@~", "?");
+            mval.setPrototypeValue(inputValue);
+            mval.setValue(ogInput);
+            mval.setUsePS(true);
           }
-          return inputValue;
+          return mval;
         }
       }
-      return getDefaultValue();
+
+      return new MappedValue(getDefaultValue());
     }
-    return inputValue;
+    return new MappedValue(inputValue);
   }
 
   public String getDefaultValue() {

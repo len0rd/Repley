@@ -2,8 +2,10 @@ package net.lenords.repley.servlet;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -45,13 +47,21 @@ public class ReporterServlet extends HttpServlet {
       Gson gson = new Gson();
       Chart chart = null;
 
+      String jsonToLoad = "";
+      try {
+        jsonToLoad = getRunningAbsolutePath() + "conf/byo-query.json";
+      } catch (Exception e) {
+        System.out.println("ERR:: Failed to get path: '" + jsonToLoad + "'");
+      }
+
       QueryModelContainer container =
-          gson.fromJson(
-              new FileReader("/Users/tylermiller/code/Repley/conf/query_conf-sample-simple.json"),
-              QueryModelContainer.class);
+          gson.fromJson(new FileReader(jsonToLoad), QueryModelContainer.class);
 
       QueryModel model = container.getQueryByName(type);
-      SqlResult result = sqlAccessor.getQueryResult(model.generateQueryFromParams(request));
+      SqlResult result =
+          model.executeQueryFromParams(
+              sqlAccessor,
+              request); // sqlAccessor.getQueryResult(model.generateQueryFromParams(request));
       if (!result.isEmpty()) {
         chart = model.generateChartFromResult(result);
       }
@@ -125,5 +135,20 @@ public class ReporterServlet extends HttpServlet {
     System.out.println(values);
     response.setContentType("application/json");
     response.getWriter().write(json);
+  }
+
+  private static String getRunningAbsolutePath() throws URISyntaxException {
+    String path = getAbsoluteJarPath();
+    path = path.substring(0, path.lastIndexOf(File.separator) + 1);
+    return path;
+  }
+
+  private static String getAbsoluteJarPath() throws URISyntaxException {
+    return ReporterServlet.class
+        .getProtectionDomain()
+        .getCodeSource()
+        .getLocation()
+        .toURI()
+        .getPath();
   }
 }
