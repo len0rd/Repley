@@ -46,12 +46,13 @@ public class ReporterServlet extends HttpServlet {
       Chart chart = null;
 
       QueryModelContainer container =
-          gson.fromJson(
-              new FileReader("/Users/tylermiller/code/Repley/conf/query_conf-sample-simple.json"),
-              QueryModelContainer.class);
+          gson.fromJson(new FileReader("conf/byo-query.json"), QueryModelContainer.class);
 
       QueryModel model = container.getQueryByName(type);
-      SqlResult result = sqlAccessor.getQueryResult(model.generateQueryFromParams(request));
+      SqlResult result =
+          model.executeQueryFromParams(
+              sqlAccessor,
+              request); // sqlAccessor.getQueryResult(model.generateQueryFromParams(request));
       if (!result.isEmpty()) {
         chart = model.generateChartFromResult(result);
       }
