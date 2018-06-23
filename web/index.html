@@ -59,7 +59,9 @@
   <script src="https://code.getmdl.io/1.3.0/material.min.js"></script>
 
   <script>
-    //alert('starting stuffff');
+    var currentFsboExpoChart, currentFrboExpoChart;
+
+
     function getServletData(qID, type, byo, elementName, callbackFunction) {
       $.ajax({
         url: 'repley',
@@ -74,7 +76,7 @@
         url: 'repley',
         type: 'GET',
         data: "q=" + qID + "&t=" + type + "&byo=" + byo + "&days=" + days,
-        success : callbackFunction(elementName)
+        success : callbackFunction(elementName, type, byo)
       });
     }
 
@@ -82,6 +84,12 @@
       return function(data, testStatus, jqXHR) {
         var ctx = document.getElementById(elementName).getContext('2d');
         var myChart = new Chart(ctx, data);
+
+        if (elementName.indexOf("fsboExpo") !== -1) {
+          currentFsboExpoChart = myChart;
+        } else if (elementName.indexOf("frboExpo") !== -1) {
+          currentFrboExpoChart = myChart;
+        }
       }
     };
 
@@ -92,6 +100,12 @@
 
         var ctx = document.getElementById(elementName).getContext('2d');
         var myChart = new Chart(ctx, data);
+
+        if (elementName.indexOf("fsboExpo") !== -1) {
+          currentFsboExpoChart = myChart;
+        } else if (elementName.indexOf("frboExpo") !== -1) {
+          currentFrboExpoChart = myChart;
+        }
       }
     };
 
@@ -105,7 +119,17 @@
 
     function selectRange(byo, type, toElement) {
       var selectedValue = document.getElementById(byo + '_' + type + '_range').value;
-      //alert(selectedValue);
+
+      if (byo === 'fsbo') {
+        if (currentFsboExpoChart != null) {
+          currentFsboExpoChart.destroy();
+        }
+      } else if (byo === 'frbo') {
+        if (currentFrboExpoChart != null) {
+          currentFrboExpoChart.destroy();
+        }
+      }
+
       getServletWithDate('chart', type, byo, toElement, selectedValue, loadChart);
     }
 
